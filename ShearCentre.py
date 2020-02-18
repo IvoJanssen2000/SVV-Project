@@ -32,9 +32,9 @@ h = 0.248;
 t = 1.1e-3;
 length = 0.515;
 theta = linspace(0, pi/2, N);
-z_cord = linspace(0, length - h, N);
+z_cord = linspace(0, length - h/2, N);
 z, y = Arc(h/2, theta);
-y_, y_1 = Triangel(h/2, length - h, z_cord);
+y_, y_1 = Triangel(h/2, length - h/2, z_cord);
 
 plt.plot(-z, y, 'x');
 plt.plot(-z, -y, 'x');
