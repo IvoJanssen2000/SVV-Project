@@ -22,26 +22,39 @@ theta = m.radians(25)  # rad
 P = 20.6*1000  # N
 
 
-################ Calculate all areas #########
+z1 = np.linspace(-0.391, 0.124, nst)
+z2 = np.linspace(-0.124, 0.124, nst)
 
 
-Ahc = 0.5*m.pi*ha*tsk # Area of half circle
-Ask = m.sqrt((ha/2)**2 + (Ca - ha/2)**2) * tsk # Area of one plane skin
-Asp = ha*tsp # Area of spar
-Ast = hst*tst + wst*tst # Area of one stringer
 
-Atot = Ahc + 2*Ask + Asp + nst*Ast
+def areas():        #### gives an array with 15 positions. Stores  Pos. 0-10 area of stringer, pos. 11 area spar, pos.12 area semi circle, pos.13+14 area skin
+    Ahc = 0.5 * m.pi * ha * tsk  # Area of half circle
+    Ask = m.sqrt((ha / 2) ** 2 + (Ca - ha / 2) ** 2) * tsk  # Area of one plane skin
+    Asp = ha * tsp  # Area of spar
+    Ast = hst * tst + wst * tst  # Area of one stringer
+    a = np.ones(nst)*Ast
+    return np.append(a, [Asp, Ahc, Ask, Ask])
 
-############ Calculate respective z-value of centroid of each component ############
+def z_centroids():      #### gives an array with 15 positions. it stores the z-coordinates of the centroid of each component. Pos. 0-10 stringer, pos. 11 spar, pos.12 semi circle, pos.13+14 skin
+    z_bar_hc = ha / m.pi
+    z_bar_sk = -((Ca - ha / 2) / 2)
+    z_bar_sp = 0
+    a = z1
+    return np.append(a, [z_bar_sp, z_bar_hc, z_bar_sk, z_bar_sk])
 
-#z_bar_hc = (4 * ha/2) / 3*m.pi  #still wrong
-z_bar_sk = -((Ca-ha/2)/2)
-z_bar_sp = 0
-offset_centroid_crosspoint_stringer = (hst/2)*hst*tst/(Ast)
+def y_centroids():      #### gives an array with 15 positions. it stores the y-coordinates of the centroid of each component. Pos. 0-10 stringer, pos. 11 spar, pos.12 semi circle, pos.13+14 skin
+    a = z2
+    return np.append(a, [0, 0, 0.25*ha, -0.25*ha])
+
+def get_total_z_centroid():     #### gives z-coordinate of centroid of whole strucutre
+    return sum(z_centroids()*areas()) / sum(areas())
 
 
-########### Calculate total z-value of centroid ############
+#offset_centroid_crosspoint_stringer = (hst/2)*hst*tst/areas()[0]
 
-#z_bar = (z) / Atot
+print(z_centroids())
+print(y_centroids())
 
-print(offset_centroid_crosspoint_stringer)
+#print(z_centroids())
+
+#print(get_total_z_centroid())
