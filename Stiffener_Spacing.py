@@ -1,5 +1,6 @@
 from numpy import *
 import matplotlib.pyplot as plt
+from pylab import *
 
 
 # Python program to calculate the spacing of the stiffeners including its width
@@ -56,7 +57,7 @@ def stiffcoord(d_st, r, C_a):
     Zlst[1] = r*cos(theta)
     Ylst[1] = r*sin(theta)
 
-    # Assign the coordinates of the 3rd stiffener transitioning from the semi-circle to the straight line
+    # Assign the coordinates of the 3rd stiffener transitioning from the semi-circle to the top diagonal line
     
     l = d_st-(pi/2-theta)*r
     delta = arctan(r/(C_a-r))
@@ -64,21 +65,21 @@ def stiffcoord(d_st, r, C_a):
     Zlst[2] = -l*cos(delta)
     Ylst[2] = -l*sin(delta)+r
 
-    # Assign the coordinates of the 4-6th stiffener on the top straight line
+    # Assign the coordinates of the 4-6th stiffener on the top diagonal line
     
     for i in range(3,6):
         Zlst[i] = Zlst[i-1] - d_st*cos(delta)
         Ylst[i] = Ylst[i-1] - d_st*sin(delta)
 
     
-    # Assign the coordinates of the 7th stiffener transitioning from the top straight line to the bottom straight line
+    # Assign the coordinates of the 7th stiffener transitioning from the top diagonal line to the bottom diagonal line
     
-    mag_5 = ((Zlst[5]+(C_a-r))**2 + Ylst[5]**2)**(1/2)  # Calculating the hypotenuse of the top straight line between the chordline and the location of the 5th stiffener
-    diffd_st = d_st-mag_5                               # Calculating the hypotenuse of the bottom straight line between the chordline and the location of the 6th stiffener
+    mag_5 = ((Zlst[5]+(C_a-r))**2 + Ylst[5]**2)**(1/2)  # Calculating the hypotenuse of the top diagonal line between the chord line and the location of the 5th stiffener
+    diffd_st = d_st-mag_5                               # Calculating the hypotenuse of the bottom diagonal line between the chordline and the location of the 6th stiffener
     Zlst[6] = diffd_st*cos(delta)-(C_a-r)               # Calculating Z coordinate of the 6th stiffener
     Ylst[6] = -diffd_st*sin(delta)                      # Calculating the Y coordinate of the 6th stiffener
 
-    # Assign the coordinates of the 8-10th stiffener on the bottom straight line
+    # Assign the coordinates of the 8-10th stiffener on the bottom diagonal line
     
     for j in range(7,10):
         Zlst[j] = Zlst[j-1] + d_st*cos(delta)
@@ -116,6 +117,8 @@ def stiffcentcoord(Zlst, Ylst):
     Zcent = zeros((11))
     Ycent = zeros((11))
 
+    # Adjusting each Z and Y coordinate with their centroid locations
+    
     Zcent[0] = Zlst[0]-2.5/1000
     Ycent[0] = Ylst[0]
 
@@ -194,22 +197,42 @@ yline = [0,0]
 zspar = [0,0]
 yspar = [0.124,-0.124]
 
+# Adding the coordinate system
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+left,right = 0, 0.08
+low,high = 0, 0.08
+arrow( left, 0, left -right, 0, length_includes_head = True, head_width = 0.01, color='green', label='test')
+arrow( 0, low, 0, high-low, length_includes_head = True, head_width = 0.01, color='green')
+ax.text(0.20, 0.48, 'Z',
+        verticalalignment='top', horizontalalignment='right',
+        transform=ax.transAxes,
+        color='green', fontsize=12)
+ax.text(0.28, 0.62, 'Y',
+        verticalalignment='baseline', horizontalalignment='right',
+        transform=ax.transAxes,
+        color='green', fontsize=12)
+
+
 # Plotting the aileron geometry
 
 plt.plot(-z, y, color='blue')        # Plotting the first quadrant of the semi-circle
 plt.plot(-z, -y, color='blue')       # Plotting the second quadrant of the semi-circle
-plt.plot(z_coord, y_, color='blue')  # Plotting the top straight line along the chord
-plt.plot(z_coord, y_1, color='blue') # Plotting the bottom straight line along the chord 
+plt.plot(z_coord, y_, color='blue')  # Plotting the top diagonal line along the chord
+plt.plot(z_coord, y_1, color='blue') # Plotting the bottom diagonal line along the chord 
 
 # Plotting the stiffeners 
 
 plt.plot(-Zlst, -Ylst, 'o', color='red')
-plt.plot(-Zcent, -Ycent,"o" ,color="purple")
+#plt.plot(-Zcent, -Ycent,"o" ,color="purple")
 
 # Plotting the chord line & the spar
 
 plt.plot(zline, yline, color='black', linestyle='dashed')
 plt.plot(zspar,yspar, color='black')
+
+
 
 plt.grid(True)
 plt.show()
