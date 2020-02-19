@@ -2,7 +2,6 @@ from math import *
 from numpy import *
 import matplotlib.pyplot as plt
 
-
 # Python program to calculate the spacing of the stiffeners including its width
 
 def diststiff():
@@ -150,3 +149,7 @@ plt.plot(zspar,yspar, color='black', linestyle='dashed')
 plt.plot(-Zcent, -Ycent,"o" ,color="purple")
 plt.grid(True)
 plt.show()
+
+
+
+
