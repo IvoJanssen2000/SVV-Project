@@ -1,6 +1,6 @@
 import numpy as np
 import math as m
-from Stiffener_Spacing import *
+#import Stiffener_Spacing as ss
 
 
 ######################## Part I - parameters as in assignment #######################################
@@ -24,8 +24,8 @@ theta = m.radians(25)  # rad
 P = 20.6*1000  # N
 
 
-z = diststiff()[2]
-y = diststiff()[3]
+#z = diststiff()[2]
+#y = diststiff()[3]
 
 
 
@@ -64,8 +64,8 @@ print(y_centroids())
 
 #print(get_total_z_centroid())
 
-print(diststiff()[2])
-print(diststiff()[3])
+#print(diststiff()[2])
+#print(diststiff()[3])
 
-print(get_total_z_centroid())
-print(get_total_y_centroid())
+#print(get_total_z_centroid())
+#print(get_total_y_centroid())
