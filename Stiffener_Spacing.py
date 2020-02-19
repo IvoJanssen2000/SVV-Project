@@ -27,7 +27,7 @@ def diststiff(C_a, h_a, n_st):
     return d_st
 
 def stiffcoord(d_st, r, C_a):
-        """Function to compute the Z and Y coordinates of each stiffener.
+    """Function to compute the Z and Y coordinates of each stiffener.
     Input arguments:
         d_st = Distance between each stiffener [m]
         C_a = Chord length [m]
@@ -102,7 +102,7 @@ def stiffcoord(d_st, r, C_a):
     return Zlst, Ylst
 
 def stiffcentcoord(Zlst, Ylst):
-        """Function to compute the Z and Y coordinates of each stiffener from their centroid lcoation.
+    """Function to compute the Z and Y coordinates of each stiffener from their centroid lcoation.
     Input arguments:
         Zlst = Numpy array of the z-coordinates of the stiffeners [m]
         Ylst = Numpy array of the y-coordinates of the stiffeners [m]
