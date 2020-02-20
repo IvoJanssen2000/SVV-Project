@@ -142,7 +142,7 @@ def MoIrotrec(b,h,theta):
 def MoIrotrec2(b,h,theta):
     return ((b**3 * h * m.sin(theta)**2 ) / 12)
 
-print(MoIrotrec(l,tsk,-theta1))
+print('test',MoIrotrec(l,tsk,-theta1))
 print(MoIrotrec2(l,tsk,-theta1))
 
 
