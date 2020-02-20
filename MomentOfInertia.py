@@ -134,6 +134,19 @@ def MoIstringery(tst,hst,wst):
     #input the dimensions of the stringer, output the MoIyy about its centroid.
     return(MoIrect(hst,tst) + MoIrect(tst,wst))
 
+<<<<<<< HEAD
+def MoIrotrec(b,h,theta):
+    return ((b * h)*(b**2 * m.cos(m.radians(90)-theta)**2 + h**2 * m.sin(m.radians(90)-theta)**2)/12)
+
+def MoIrotrec2(b,h,theta):
+    return ((b**3 * h * m.sin(theta)**2 ) / 12)
+
+print('test',MoIrotrec(l,tsk,-theta1))
+print(MoIrotrec2(l,tsk,-theta1))
+
+
+=======
+>>>>>>> 4e4da82c3eaecb0ec9913bc7fb070dbc432a97c0
 def MoIconv(Ixx,Iyy,theta):
     "This program calculates the Moment of Inertia when rotating the reference frame."
     "Input the moment of inertia about axis system x-y, and the rotation angle theta."
