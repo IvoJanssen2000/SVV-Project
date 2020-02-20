@@ -2,6 +2,7 @@ from numpy import *
 import matplotlib.pyplot as plt
 from pylab import *
 
+
 # Python program to calculate the spacing of the stiffeners including its width
 
 def diststiff(C_a, h_a, n_st):
@@ -196,7 +197,7 @@ yline = [0,0]
 zspar = [0,0]
 yspar = [0.124,-0.124]
 
-# Adding the coordinate system
+# Adding the ZY coordinate system
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -213,7 +214,6 @@ ax.text(0.28, 0.62, 'Y',
         transform=ax.transAxes,
         color='green', fontsize=12)
 
-
 # Plotting the aileron geometry
 
 plt.plot(-z, y, color='blue')        # Plotting the first quadrant of the semi-circle
@@ -223,19 +223,15 @@ plt.plot(z_coord, y_1, color='blue') # Plotting the bottom diagonal line along t
 
 # Plotting the stiffeners 
 
-plt.plot(-Zlst, -Ylst, 'o', color='red')
-#plt.plot(-Zcent, -Ycent,"o" ,color="purple")
+plt.plot(-Zlst, -Ylst, 'o', color='red')     # Stiffeners without centroid
+plt.plot(-Zcent, -Ycent,"o" ,color="purple") # Stiffenrs with centroid
 
 # Plotting the chord line & the spar
 
 plt.plot(zline, yline, color='black', linestyle='dashed')
 plt.plot(zspar,yspar, color='black')
 
-
+# Plotting on the figure
 
 plt.grid(True)
 plt.show()
-
-
-
-
