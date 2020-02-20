@@ -130,7 +130,7 @@ def ShearFlowIntegrate(q, DOP, s):
 
 
 #%% Input Data
-N = 1000;
+N = 10000;
 h = 0.248; r = h/2;
 t = 1.1e-3;
 t_spar = 2.2e-3;
@@ -158,11 +158,11 @@ stringer_pos = array([[0.1215 , 0.0 ],
 [-0.023270899230499863 , -0.11399894755861384],
 [0.07675071331511048 , -0.09418647580945623 ]]);		# (z, y)
 
-stringer_pos_s = array([0.0, 0.10999458035397217, 
-						0.2199891502692524, 0.32998372175408963, 
-						0.439978302771062, 0.5499728742558994, 
-						0.659967452249893, 0.7699620237347303, 
-						0.8799566047517027, 0.9899511762365399, 1.09994574615182]);
+stringer_pos_s = array([0.0, 0.10999390226942096,
+					   0.22010769635503435, 0.3300018343791974,
+					  0.43998605554511216, 0.5499766891204068,
+					 0.6599636373853857, 0.7699542709606804,
+					0.8799384921265951, 0.9898326301507581, 1.0999464242363712]);
 
 
 #%% Section 1 & 2 (Noa's Arc)
@@ -172,7 +172,7 @@ direction.
 """
 dtheta = absolute(arctan(y_arc1[1:]/z_arc1[1:]) - arctan(y_arc1[: -1]/z_arc1[:-1]));
 q_boom = -1/Izz*A_stringer*stringer_pos[:, 1]; 
-qb_skin1, s1 = ShearFlow(0, t, r*dtheta, y_arc1, [stringer_pos_s[1]],[q_boom[0]]);
+qb_skin1, s1 = ShearFlow(0, t, r*dtheta, y_arc1, [stringer_pos_s[1]], [q_boom[1]]);
 print("first call")
 
 qb_skin2 = -qb_skin1;
@@ -216,39 +216,39 @@ for i in range(len(qb_skin1) - 1):
 	Fy += sin(pi/2 - theta)*qb_skin1[i]*ds;
 
 
-#for i in range(len(qb_skin2) - 1):
-#	theta = arctan(y_arc2[i]/z_arc1[i]);
-#	dtheta = abs(arctan(y_arc2[i - 1]/z_arc1[i - 1]) - theta);
-#	ds = r*dtheta;
-#	Fz -= cos(pi/2 - abs(theta))*qb_skin2[i]*ds;
-#	Fy -= sin(pi/2 - abs(theta))*qb_skin2[i]*ds;
+for i in range(len(qb_skin2) - 1):
+	theta = arctan(y_arc2[i]/z_arc1[i]);
+	dtheta = abs(arctan(y_arc2[i - 1]/z_arc1[i - 1]) - theta);
+	ds = r*dtheta;
+	Fz -= cos(pi/2 - abs(theta))*qb_skin2[i]*ds;
+	Fy -= sin(pi/2 - abs(theta))*qb_skin2[i]*ds;
 
 #for i in range(len(qb_skin3) - 1):
 #	ds = y_spar2[i + 1] - y_spar2[i];
 #	Fy += 2*qb_skin3[i]*ds;
 #Fy += 2*ShearFlowIntegrate(qb_skin3, DOP, s3);
 	
-#for i in range(len(qb_skin5) - 1):
-#	ds = y_spar2[i + 1] - y_spar2[i];
-#	Fy += qb_skin5[i]*ds;
+for i in range(len(qb_skin5) - 1):
+	ds = y_spar2[i + 1] - y_spar2[i];
+	Fy += qb_skin5[i]*ds;
 	
-#for i in range(len(qb_skin6) - 1):
-#	ds = y_spar1[i + 1] - y_spar1[i];
-#	Fy -= qb_skin6[i]*ds;
+for i in range(len(qb_skin6) - 1):
+	ds = y_spar1[i + 1] - y_spar1[i];
+	Fy -= qb_skin6[i]*ds;
 
-#for i in range(len(qb_skin7) - 1):
-#	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
-#	ds = norm(array([dy, dz]));
-#	theta = abs(arctan(dy/dz));
-#	Fz -= cos(theta)*qb_skin7[i]*ds;
-#	Fy -= sin(theta)*qb_skin7[i]*ds;
+for i in range(len(qb_skin7) - 1):
+	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
+	ds = norm(array([dy, dz]));
+	theta = abs(arctan(dy/dz));
+	Fz -= cos(theta)*qb_skin7[i]*ds;
+	Fy -= sin(theta)*qb_skin7[i]*ds;
 
-#for i in range(len(qb_skin8) - 1):
-#	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
-#	ds = norm(array([dy, dz]));
-#	theta = abs(arctan(dy/dz));
-#	Fz -= cos(theta)*qb_skin8[i]*ds;
-#	Fy += sin(theta)*qb_skin8[i]*ds;
+for i in range(len(qb_skin8) - 1):
+	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
+	ds = norm(array([dy, dz]));
+	theta = abs(arctan(dy/dz));
+	Fz -= cos(theta)*qb_skin8[i]*ds;
+	Fy += sin(theta)*qb_skin8[i]*ds;
 
 print("Fz =", Fz);
 print("Fy =", Fy);
