@@ -216,7 +216,7 @@ print("Iyy = ", sum(Steinerylst)+MoIygen())
 Steinerylst += [Asemicircle(R,r)*2*abs(zcentroid)*2*R/np.pi]
 print(2*abs(zcentroid)*2*R/np.pi*Asemicircle(R,r))
 
-#Izz = 1.028e-05
+#Izz = 1.42e-05
 #Iyy = 5.377e-05
 Izz = sum(Steinerzlst)+MoIzgen()
 Iyy = sum(Steinerylst)+MoIygen()
