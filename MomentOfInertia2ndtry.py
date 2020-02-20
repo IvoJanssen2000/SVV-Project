@@ -190,7 +190,7 @@ def MoIygen():
 zcentroid = -0.0834027457341936
 ycentroid = 0
 
-#ycentroidlst = ycentroidlstgen()
+ycentroidlst = ycentroidlstgen()
 #zcentroidlst = zcentroidlstgen()
 
 #print(zcentroidlst,ycentroidlst)
@@ -200,9 +200,9 @@ Alst = Alstgen(Nstringer,Nspar,Nsemi,Npanel)
 
 #print("Alst = ", Alst)
 
-#Steinerzlst = []
-#for i in range(len(ycentroidlst)):
-#    Steinerzlst += [Alst[i]*abs(ycentroid-ycentroidlst[i])**2]
+Steinerzlst = []
+for i in range(len(ycentroidlst)):
+    Steinerzlst += [Alst[i]*abs(ycentroid-ycentroidlst[i])**2]
 Steinerylst = []
 for i in range(len(zcentroidlst)):
     Steinerylst += [Alst[i]*abs(zcentroid-zcentroidlst[i])**2]
