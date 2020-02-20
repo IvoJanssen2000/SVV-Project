@@ -86,7 +86,7 @@ def Quadrature_weightTransform(nodes, weights, a, b):
 	w = (b - a)/2*weights;
 	return x_int, w;
 
-def ShearFlow(BC, t, ds, y, s_stringer, q_boom):
+def ShearFlow(BC, t, ds, y, s_stringer,q_boom):
 	""" Function to compute the shear flow distribution over y, integrated over the differential
 		element ds
 	Input Arguments:
@@ -102,11 +102,14 @@ def ShearFlow(BC, t, ds, y, s_stringer, q_boom):
 	c = 0;
 	for i in range(1, len(qb_array)):
 		qb_array[i] = qb_array[i - 1] - 1/Izz*t*y[i]*ds[i - 1];
-		s[i] = s[i - 1] + ds[i - 1];
-		if s[i] >= s_stringer and c == 0:
-			qb_array[i] += q_boom;
-			print(q_boom)
-			c += 1;
+		s[i] = s[i - 1] + ds[i - 1];		
+		check = len(s_stringer)*[True]
+		if(c<len(s_stringer)):
+			if s[i] >= s_stringer[c] and check[c]:
+				qb_array[i] += q_boom[c];
+				print(q_boom, "here")
+				check[c] = False
+				c += 1;
 	return qb_array, s;
 
 def ShearFlowIntegrate(q, DOP, s):
@@ -127,7 +130,7 @@ def ShearFlowIntegrate(q, DOP, s):
 
 
 #%% Input Data
-N = 10;
+N = 1000;
 h = 0.248; r = h/2;
 t = 1.1e-3;
 t_spar = 2.2e-3;
@@ -141,7 +144,7 @@ y_, y_1, zero, y_spar = Triangel(h/2, length - r, z_cord);
 DOP = 3;
 x_int_std = linspace(-1, 1, DOP);
 w_std = Quadrature_weights(x_int_std);
-A_stringer = 5.4e-1;
+A_stringer = 5.4e-5;
 stringer_no = 11;
 stringer_pos = array([[0.1215 , 0.0 ], 
 [0.07675071331511048 , 0.09418647580945623  ],
@@ -168,8 +171,9 @@ Due to symmetry shear flow in section 1 and 2 are the same but in opposet
 direction.
 """
 dtheta = absolute(arctan(y_arc1[1:]/z_arc1[1:]) - arctan(y_arc1[: -1]/z_arc1[:-1]));
-q_boom = -1/Izz*A_stringer*stringer_pos[1, 1]; 
-qb_skin1, s1 = ShearFlow(0, t, r*dtheta, y_arc1, s_[1], q_boom);
+q_boom = -1/Izz*A_stringer*stringer_pos[:, 1]; 
+qb_skin1, s1 = ShearFlow(0, t, r*dtheta, y_arc1, [stringer_pos_s[1]],[q_boom[0]]);
+print("first call")
 
 qb_skin2 = -qb_skin1;
 
@@ -189,7 +193,7 @@ y_spar2 = y_spar[int(len(y_spar)/2) :];			# y coordinates from the mid point to 
 Due to symmetry shear flow in section 1 and 2 are in the same direction. Cut is made at the mid point to preserve symmetry
 """
 ds = (y_spar1[1] - y_spar1[0])*ones_like(y_spar1);
-qb_skin5, s5 = ShearFlow(0, t_spar, ds, y_spar2, 0, 0);
+qb_skin5, s5 = ShearFlow(0, t_spar, ds, y_spar2, [0],[0]);
 qb_skin6 = -qb_skin5[::-1];
 
 #%% Section 5 & 6 (Arms of the triangle)
@@ -198,7 +202,7 @@ Due to symmetry shear flow in section 5 and 6 are the same but in opposite direc
 """
 dy = y_[1] - y_[0]; dz = z_cord[1] - z_cord[0];
 ds = norm(array([dy, dz]))*ones_like(y_);
-qb_skin7, s7 = ShearFlow(qb_skin5[-1] - qb_skin2[-1], t, ds, y_, 0, 0);
+qb_skin7, s7 = ShearFlow(qb_skin5[-1] - qb_skin2[-1], t, ds, y_, stringer_pos_s[2:6]-pi*r/2,q_boom[2:6]);
 qb_skin8 = -qb_skin7;
 
 #%% Verification
@@ -212,39 +216,39 @@ for i in range(len(qb_skin1) - 1):
 	Fy += sin(pi/2 - theta)*qb_skin1[i]*ds;
 
 
-for i in range(len(qb_skin2) - 1):
-	theta = arctan(y_arc2[i]/z_arc1[i]);
-	dtheta = abs(arctan(y_arc2[i - 1]/z_arc1[i - 1]) - theta);
-	ds = r*dtheta;
-	Fz -= cos(pi/2 - abs(theta))*qb_skin2[i]*ds;
-	Fy -= sin(pi/2 - abs(theta))*qb_skin2[i]*ds;
+#for i in range(len(qb_skin2) - 1):
+#	theta = arctan(y_arc2[i]/z_arc1[i]);
+#	dtheta = abs(arctan(y_arc2[i - 1]/z_arc1[i - 1]) - theta);
+#	ds = r*dtheta;
+#	Fz -= cos(pi/2 - abs(theta))*qb_skin2[i]*ds;
+#	Fy -= sin(pi/2 - abs(theta))*qb_skin2[i]*ds;
 
 #for i in range(len(qb_skin3) - 1):
 #	ds = y_spar2[i + 1] - y_spar2[i];
 #	Fy += 2*qb_skin3[i]*ds;
 #Fy += 2*ShearFlowIntegrate(qb_skin3, DOP, s3);
 	
-for i in range(len(qb_skin5) - 1):
-	ds = y_spar2[i + 1] - y_spar2[i];
-	Fy += qb_skin5[i]*ds;
+#for i in range(len(qb_skin5) - 1):
+#	ds = y_spar2[i + 1] - y_spar2[i];
+#	Fy += qb_skin5[i]*ds;
 	
-for i in range(len(qb_skin6) - 1):
-	ds = y_spar1[i + 1] - y_spar1[i];
-	Fy -= qb_skin6[i]*ds;
+#for i in range(len(qb_skin6) - 1):
+#	ds = y_spar1[i + 1] - y_spar1[i];
+#	Fy -= qb_skin6[i]*ds;
 
-for i in range(len(qb_skin7) - 1):
-	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
-	ds = norm(array([dy, dz]));
-	theta = abs(arctan(dy/dz));
-	Fz -= cos(theta)*qb_skin7[i]*ds;
-	Fy -= sin(theta)*qb_skin7[i]*ds;
+#for i in range(len(qb_skin7) - 1):
+#	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
+#	ds = norm(array([dy, dz]));
+#	theta = abs(arctan(dy/dz));
+#	Fz -= cos(theta)*qb_skin7[i]*ds;
+#	Fy -= sin(theta)*qb_skin7[i]*ds;
 
-for i in range(len(qb_skin8) - 1):
-	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
-	ds = norm(array([dy, dz]));
-	theta = abs(arctan(dy/dz));
-	Fz -= cos(theta)*qb_skin8[i]*ds;
-	Fy += sin(theta)*qb_skin8[i]*ds;
+#for i in range(len(qb_skin8) - 1):
+#	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
+#	ds = norm(array([dy, dz]));
+#	theta = abs(arctan(dy/dz));
+#	Fz -= cos(theta)*qb_skin8[i]*ds;
+#	Fy += sin(theta)*qb_skin8[i]*ds;
 
 print("Fz =", Fz);
 print("Fy =", Fy);
