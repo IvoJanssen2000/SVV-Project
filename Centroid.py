@@ -1,5 +1,6 @@
 import numpy as np
 import math as m
+
 from stiffener_spacing import diststiff
 
 
@@ -64,8 +65,8 @@ print(y_centroids())
 
 #print(get_total_z_centroid())
 
-print(diststiff()[2])
-print(diststiff()[3])
+#print(diststiff()[2])
+#print(diststiff()[3])
 
-print(get_total_z_centroid())
-print(get_total_y_centroid())
+#print(get_total_z_centroid())
+#print(get_total_y_centroid())
