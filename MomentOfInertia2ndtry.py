@@ -99,27 +99,55 @@ def Alstgen(Nstringer,Nspar,Nsemi,Npanel):
         Alst += [Apanel(l,tsk)]
     return Alst
 
+ylstt = [
+0.0,
+0.09418647580945623,
+0.11399894755861381,
+0.08074781968472415,
+0.047496691810834483,
+0.014245563936944823,
+-0.01424556393694485,
+-0.04749669181083451,
+-0.08074781968472418,
+-0.11399894755861384,
+-0.09418647580945623]
+
+zlstt = [
+0.1215,
+0.07675071331511048,
+-0.02327089923050003,
+-0.12811921373607146,
+-0.2329675282416429,
+-0.3378158427472144,
+-0.3378158427472142,
+-0.23296752824164274,
+-0.1281192137360713,
+-0.023270899230499863,
+0.07675071331511048]
+
 def ycentroidlstgen():
     stringerylst = stringerylstgen()
-    ycentroidlst = stringerylst
+    ycentroidlst = ylstt
     ycentroidlst += [0.]
     ycentroidlst += [0.]
     ycentroidlst += [l*m.sin(theta)/2]
     ycentroidlst += [-l*m.sin(theta)/2]
     return ycentroidlst
 
-print(l*m.cos(theta)/2)
-
-print(l*m.cos(theta)/2)
-
 def zcentroidlstgen():
     stringerzlst = stringerzlstgen()
-    zcentroidlst = stringerzlst
+    zcentroidlst = zlstt
     zcentroidlst += [0.]
     zcentroidlst += [2*R/np.pi]
     zcentroidlst += [-l*m.cos(theta)/2]
     zcentroidlst += [-l*m.cos(theta)/2]
     return(zcentroidlst)
+
+zcentroidlst = zlstt
+zcentroidlst += [0.]
+zcentroidlst += [2*R/np.pi]
+zcentroidlst += [-l*m.cos(theta)/2]
+zcentroidlst += [-l*m.cos(theta)/2]
 
 #stringer, spar, semi, top, bottom
 def zcentroidgen():
@@ -137,14 +165,14 @@ def ycentroidgen():
     for i in range(len(Alst)):
         lst += [Alst[i]*ycentroidlst[i]]
         return(sum(lst)/sum(Alst))
-       
+
 def MoIrotrec(b,h,theta):
     return ((b * h)*(b**2 * m.cos(m.radians(90)-theta)**2 + h**2 * m.sin(m.radians(90)-theta)**2)/12)
 
 def MoIsemi(R,r):
     #input the outer and inner radius of semi circle, output the moment of inertia about the center! NOT CENTROID!
     return((np.pi/8)*(R**4-r**4))
-    
+
 def MoIzgen():
     MoIz = 0
     MoIz += MoIrotrec(tsp,h,0) #Spar
@@ -158,12 +186,12 @@ def MoIygen():
     MoIy += MoIsemi(R,r) #Leading edge
     MoIy += 2*MoIrotrec(tsk,l,m.radians(90)-theta) # Panels
     return MoIy  
-        
-zcentroid = zcentroidgen()
-ycentroid = ycentroidgen()
 
-ycentroidlst = ycentroidlstgen()
-zcentroidlst = zcentroidlstgen()
+zcentroid = -0.0834027457341936
+ycentroid = 0
+
+#ycentroidlst = ycentroidlstgen()
+#zcentroidlst = zcentroidlstgen()
 
 #print(zcentroidlst,ycentroidlst)
 print('zbar = ',zcentroid,', ybar = ',ycentroid)
@@ -172,14 +200,13 @@ Alst = Alstgen(Nstringer,Nspar,Nsemi,Npanel)
 
 #print("Alst = ", Alst)
 
-Steinerzlst = []
-for i in range(len(ycentroidlst)):
-    Steinerzlst += [Alst[i]*abs(ycentroid-ycentroidlst[i])**2]
-
+#Steinerzlst = []
+#for i in range(len(ycentroidlst)):
+#    Steinerzlst += [Alst[i]*abs(ycentroid-ycentroidlst[i])**2]
 Steinerylst = []
 for i in range(len(zcentroidlst)):
     Steinerylst += [Alst[i]*abs(zcentroid-zcentroidlst[i])**2]
-    
+
 #print(Steinerzlst)
 #print(Steinerylst)
     
