@@ -172,9 +172,6 @@ z_cord = linspace(0, chord - r, N);
 z_arc1, y_arc1 = Arc(h/2, theta);				# Arc 1 = upper arc
 y_arc2 = -y_arc1;								# Arc 2 = lower arc
 y_, y_1, zero, y_spar = Triangel(h/2, chord - r, z_cord);
-DOP = 3;
-x_int_std = linspace(-1, 1, DOP);
-w_std = Quadrature_weights(x_int_std);
 A_stringer = 5.4e-5;
 length_arm = sqrt(r**2 + (chord - r)**2);
 s_max = pi*r + 2*length_arm;
