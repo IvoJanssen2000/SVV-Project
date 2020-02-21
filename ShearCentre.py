@@ -1,7 +1,7 @@
 from numpy import*
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from numpy.linalg import norm, inv
+from numpy.linalg import norm, inv, det
 
 def Arc(r, theta):
 	""" Function to compute the y and z coordinates of the LE arc 
@@ -9,7 +9,7 @@ def Arc(r, theta):
 		r = radius of the arc (float) [m]
 		theta = range of theta values (numpy array) [rad]
 	Output:
-		y, z coordinates
+		y, z coordinates (numpy array)
 	"""
 	y = r*sin(theta);
 	z = r*cos(theta);
@@ -21,13 +21,13 @@ def Triangel(height, length, z):
 		h = Height of the triangle (float) [m]
 		length = Length of the airfoil - radius of arc (float) [m]
 	Output:
-		y, z coordinates
+		y, z coordinates (numpy array)
 	"""
 	dydz = -height/length;
 	y = height + dydz*z;
 	y1 = -height - dydz*z;
-	zero = zeros_like(z)[1: -1];
-	y_spar = linspace(-height, height, len(z))[1: -1];
+	zero = zeros_like(z);
+	y_spar = linspace(-height, height, len(z));
 	return y, y1, zero, y_spar;
 
 ## Quadrature
@@ -86,7 +86,7 @@ def Quadrature_weightTransform(nodes, weights, a, b):
 	w = (b - a)/2*weights;
 	return x_int, w;
 
-def ShearFlow(BC, t, ds, y, s_stringer,q_boom):
+def ShearFlow(BC, t, Izz, ds, y, s_stringer, q_boom):
 	""" Function to compute the shear flow distribution over y, integrated over the differential
 		element ds
 	Input Arguments:
@@ -102,35 +102,29 @@ def ShearFlow(BC, t, ds, y, s_stringer,q_boom):
 	c = 0;
 	for i in range(1, len(qb_array)):
 		qb_array[i] = qb_array[i - 1] - 1/Izz*t*y[i]*ds[i - 1];
-		s[i] = s[i - 1] + ds[i - 1];		
-		check = len(s_stringer)*[True]
-		if(c<len(s_stringer)):
+		s[i] = s[i - 1] + ds[i - 1];
+		check = len(s_stringer)*[True];
+		if (c < len(s_stringer)):
 			if s[i] >= s_stringer[c] and check[c]:
 				qb_array[i] += q_boom[c];
-				print(q_boom, "here")
-				check[c] = False
+				check[c] = False;
 				c += 1;
 	return qb_array, s;
 
-def ShearFlowIntegrate(q, DOP, s):
+def ShearFlowIntegrate(q, ds, t):
 	""" Function to integrate the shear flow distribution to find shear force
 	Input Arguments:
 		q = shear flow distribution (numpy array) [N/m]
-		DOP = Degree of Precision of the Quadrature rule desired (int)
-		s = vector of s coordinates (numpy array)
+		ds = vector of steps in s(numpy array)
 	Output:
 		Sf = Shear Force (float) [N]
 	"""
-	global x_int_std, w_std;
-	idx_skip = int(ceil(len(s)/DOP));
-	q = q[::idx_skip]; s = s[::idx_skip];
-	x_int, w = Quadrature_weightTransform(x_int_std, w_std, s[0], s[-1]);
-	Sf = integrate(q, w);
+	Sf = q.dot(ds)/t;
 	return Sf;
 
 
 #%% Input Data
-N = 10000;
+N = 1000;
 h = 0.248; r = h/2;
 t = 1.1e-3;
 t_spar = 2.2e-3;
@@ -145,7 +139,6 @@ DOP = 3;
 x_int_std = linspace(-1, 1, DOP);
 w_std = Quadrature_weights(x_int_std);
 A_stringer = 5.4e-5;
-stringer_no = 11;
 stringer_pos = array([[0.1215 , 0.0 ], 
 [0.07675071331511048 , 0.09418647580945623  ],
 [-0.02327089923050003 , 0.11399894755861381 ],
@@ -170,40 +163,29 @@ stringer_pos_s = array([0.0, 0.10999390226942096,
 Due to symmetry shear flow in section 1 and 2 are the same but in opposet
 direction.
 """
-dtheta = absolute(arctan(y_arc1[1:]/z_arc1[1:]) - arctan(y_arc1[: -1]/z_arc1[:-1]));
+dtheta1 = absolute(arctan(y_arc1[1]/z_arc1[1]) - arctan(y_arc1[0]/z_arc1[0]))*ones_like(y_arc1);
 q_boom = -1/Izz*A_stringer*stringer_pos[:, 1]; 
-qb_skin1, s1 = ShearFlow(0, t, r*dtheta, y_arc1, [stringer_pos_s[1]], [q_boom[1]]);
-print("first call")
-
+qb_skin1, s1 = ShearFlow(0, t, Izz, r*dtheta1, y_arc1, [stringer_pos_s[1]], [q_boom[1]]);
 qb_skin2 = -qb_skin1;
-
-##%% Section 3 & 4 (Vertical Spar)
-#""" This section computes the shear flow in the vertical spar (contributing to section of the arc) of the Aileron
-#Due to symmetry shear flow in section 3 and 4 are in the same direction.
-#"""
-y_spar1 = y_spar[: int(len(y_spar)/2)];			# y coordinates from the bottom of the spar to the mid point
-y_spar2 = y_spar[int(len(y_spar)/2) :];			# y coordinates from the mid point to the top
-
-#ds = (y_spar1[1] - y_spar1[0])*ones_like(y_spar1);
-#qb_skin3, s3 = ShearFlow(qb_skin2[-1], t_spar, ds, y_spar1);
-#qb_skin4 = qb_skin3[::-1];
 
 #%% Section 3 & 4 (Vertical Spar)
 """ This section computes the shear flow in the vertical spar (contributing to section of the triangle) of the Aileron
 Due to symmetry shear flow in section 1 and 2 are in the same direction. Cut is made at the mid point to preserve symmetry
 """
-ds = (y_spar1[1] - y_spar1[0])*ones_like(y_spar1);
-qb_skin5, s5 = ShearFlow(0, t_spar, ds, y_spar2, [0],[0]);
-qb_skin6 = -qb_skin5[::-1];
+y_spar1 = y_spar[: int(len(y_spar)/2)];			# y coordinates from the bottom of the spar to the mid point
+y_spar2 = y_spar[int(len(y_spar)/2) :];			# y coordinates from the mid point to the top
+ds3 = (y_spar1[1] - y_spar1[0])*ones_like(y_spar);
+qb_skin3, s5 = ShearFlow(0, t_spar, Izz, ds3[: int(len(y_spar1))], y_spar2, [0], [0]);
+qb_skin4 = -qb_skin3[::-1];
 
 #%% Section 5 & 6 (Arms of the triangle)
 """ This section computes the shear flow in the two arams of the triangle (contributing to section of the triangle) of the Aileron
 Due to symmetry shear flow in section 5 and 6 are the same but in opposite directions. Cut is made at the mid point to preserve symmetry
 """
 dy = y_[1] - y_[0]; dz = z_cord[1] - z_cord[0];
-ds = norm(array([dy, dz]))*ones_like(y_);
-qb_skin7, s7 = ShearFlow(qb_skin5[-1] - qb_skin2[-1], t, ds, y_, stringer_pos_s[2:6]-pi*r/2,q_boom[2:6]);
-qb_skin8 = -qb_skin7;
+ds5 = norm(array([dy, dz]))*ones_like(y_);
+qb_skin5, s7 = ShearFlow(qb_skin3[-1] - qb_skin2[-1], t, Izz, ds5, y_, stringer_pos_s[2: 6] - pi*r/2, q_boom[2: 6]);
+qb_skin6 = -qb_skin5;
 
 #%% Verification
 Fz = 0;
@@ -215,43 +197,120 @@ for i in range(len(qb_skin1) - 1):
 	Fz -= cos(pi/2 - theta)*qb_skin1[i]*ds;
 	Fy += sin(pi/2 - theta)*qb_skin1[i]*ds;
 
-
 for i in range(len(qb_skin2) - 1):
 	theta = arctan(y_arc2[i]/z_arc1[i]);
-	dtheta = abs(arctan(y_arc2[i - 1]/z_arc1[i - 1]) - theta);
+	dtheta = abs(arctan(y_arc2[i + 1]/z_arc1[i + 1]) - theta);
 	ds = r*dtheta;
 	Fz -= cos(pi/2 - abs(theta))*qb_skin2[i]*ds;
 	Fy -= sin(pi/2 - abs(theta))*qb_skin2[i]*ds;
-
-#for i in range(len(qb_skin3) - 1):
-#	ds = y_spar2[i + 1] - y_spar2[i];
-#	Fy += 2*qb_skin3[i]*ds;
-#Fy += 2*ShearFlowIntegrate(qb_skin3, DOP, s3);
 	
-for i in range(len(qb_skin5) - 1):
+for i in range(len(qb_skin3) - 1):
 	ds = y_spar2[i + 1] - y_spar2[i];
-	Fy += qb_skin5[i]*ds;
+	Fy += qb_skin3[i]*ds;
 	
-for i in range(len(qb_skin6) - 1):
+for i in range(len(qb_skin4) - 1):
 	ds = y_spar1[i + 1] - y_spar1[i];
-	Fy -= qb_skin6[i]*ds;
+	Fy -= qb_skin4[i]*ds;
 
-for i in range(len(qb_skin7) - 1):
+for i in range(len(qb_skin5) - 1):
 	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
 	ds = norm(array([dy, dz]));
 	theta = abs(arctan(dy/dz));
-	Fz -= cos(theta)*qb_skin7[i]*ds;
-	Fy -= sin(theta)*qb_skin7[i]*ds;
+	Fz -= cos(theta)*qb_skin5[i]*ds;
+	Fy -= sin(theta)*qb_skin5[i]*ds;
 
-for i in range(len(qb_skin8) - 1):
+for i in range(len(qb_skin6) - 1):
 	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
 	ds = norm(array([dy, dz]));
 	theta = abs(arctan(dy/dz));
-	Fz -= cos(theta)*qb_skin8[i]*ds;
-	Fy += sin(theta)*qb_skin8[i]*ds;
+	Fz -= cos(theta)*qb_skin6[i]*ds;
+	Fy += sin(theta)*qb_skin6[i]*ds;
 
-print("Fz =", Fz);
-print("Fy =", Fy);
+print("Fz =", Fz, "N");
+print("Fy =", Fy, "N,", "percentage error =", (1 - Fy)*100, "%");
+
+#%% qs0 Calculation
+b = zeros(2);
+qb_skin34 = concatenate((-qb_skin3, qb_skin4));
+qbI = stack((qb_skin1, -qb_skin2, qb_skin34));
+qb_skin34_II = concatenate((qb_skin3, -qb_skin4));
+qbII = stack((qb_skin34_II, qb_skin5, -qb_skin6));
+qb = [qbI, qbII];
+for i in range(len(b)):
+	for j in range(len(qbI)):
+		if i == 0:
+			if j == 0 or j == 1:
+				ds = r*dtheta1;
+				thickness = t;
+			else:
+				ds = ds3;
+				thickness = t_spar;
+		elif i == 1:
+			if j == 0:
+				ds = ds3;
+				thickness = t_spar;
+			else:
+				ds = ds5;
+				thickness = t;
+		b[i] += ShearFlowIntegrate(qb[i][j, :], ds, thickness);
+b = -b;
+M = array([[h/t_spar + pi*r/t, -h/t_spar], [-h/t_spar, h/t_spar + 2*sqrt((length - r)**2 + r**2)/t]]);
+qs0 = inv(M).dot(b);
+
+
+#%% Verification qs0
+qb_skin1 = qb_skin1 + qs0[0];
+qb_skin2 = qb_skin2 - qs0[0];
+qb_skin3 = qb_skin3 - qs0[0] + qs0[1];
+qb_skin4 = qb_skin4 + qs0[0] - qs0[1];
+qb_skin5 = qb_skin5 + qs0[1];
+qb_skin6 = qb_skin6 - qs0[1];
+
+Fz = 0;
+Fy = 0;
+for i in range(len(qb_skin1) - 1):
+	theta = arctan(y_arc1[i]/z_arc1[i]);
+	dtheta = abs(arctan(y_arc1[i + 1]/z_arc1[i + 1]) - theta);
+	ds = r*dtheta;
+	Fz -= cos(pi/2 - theta)*qb_skin1[i]*ds;
+	Fy += sin(pi/2 - theta)*qb_skin1[i]*ds;
+
+for i in range(len(qb_skin2) - 1):
+	theta = arctan(y_arc2[i]/z_arc1[i]);
+	dtheta = abs(arctan(y_arc2[i + 1]/z_arc1[i + 1]) - theta);
+	ds = r*dtheta;
+	Fz -= cos(pi/2 - abs(theta))*qb_skin2[i]*ds;
+	Fy -= sin(pi/2 - abs(theta))*qb_skin2[i]*ds;
+	
+for i in range(len(qb_skin3) - 1):
+	ds = y_spar2[i + 1] - y_spar2[i];
+	Fy += qb_skin3[i]*ds;
+	
+for i in range(len(qb_skin4) - 1):
+	ds = y_spar1[i + 1] - y_spar1[i];
+	Fy -= qb_skin4[i]*ds;
+
+for i in range(len(qb_skin5) - 1):
+	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
+	ds = norm(array([dy, dz]));
+	theta = abs(arctan(dy/dz));
+	Fz -= cos(theta)*qb_skin5[i]*ds;
+	Fy -= sin(theta)*qb_skin5[i]*ds;
+
+for i in range(len(qb_skin6) - 1):
+	dy = y_[i + 1] - y_[i]; dz = z_cord[i + 1] - z_cord[i];
+	ds = norm(array([dy, dz]));
+	theta = abs(arctan(dy/dz));
+	Fz -= cos(theta)*qb_skin6[i]*ds;
+	Fy += sin(theta)*qb_skin6[i]*ds;
+
+print("Fz =", Fz, "N");
+print("Fy =", Fy, "N,", "percentage error =", (1 - Fy)*100, "%");
+
+Moment = -r*ShearFlowIntegrate(qb_skin1, r*dtheta1, 1);
+Moment += r*ShearFlowIntegrate(qb_skin2, r*dtheta1, 1);
+SC = Moment;
+print("Shear Centre Location (z, y) =", (SC, 0), "[m]");
 
 #%% Plots
 fig = plt.figure(figsize = (8, 8));
@@ -260,13 +319,11 @@ ax = plt.axes(projection = '3d');
 ax.scatter(-z_arc1, y_arc1, qb_skin1);
 ax.scatter(-z_arc1, y_arc2, qb_skin2);
 # Spar Shear Flows
-#ax.scatter(zero[: int(len(zero)/2)], y_spar1, qb_skin3);		# Section (Arc)
-ax.scatter(zero[: int(len(zero)/2)], y_spar1, qb_skin6);		# Section (Spar)
-#ax.scatter(zero[int(len(zero)/2) :], y_spar2, qb_skin4);		# Section (Arc)
-ax.scatter(zero[int(len(zero)/2) :], y_spar2, qb_skin5);		# Section (Spar)
+ax.scatter(zero[: int(len(zero)/2)], y_spar1, qb_skin4);
+ax.scatter(zero[int(len(zero)/2) :], y_spar2, qb_skin3);
 # Trangle arms shear flow
-ax.scatter(z_cord, y_, qb_skin7);
-ax.scatter(z_cord, y_1, qb_skin8);
+ax.scatter(z_cord, y_, qb_skin5);
+ax.scatter(z_cord, y_1, qb_skin6);
 plt.plot(-z_arc1, y_arc1, 'x');
 plt.plot(-z_arc1, y_arc2, 'x');
 plt.plot(z_cord, y_, 'x');
