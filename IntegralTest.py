@@ -1,5 +1,22 @@
 from numpy import*
 from numpy.linalg import inv, norm
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+def Cosine_Sampler(a, b, n):
+	""" Function to sample n points in [a, b] with non-uniform (Cosine) distribution
+	Input Arguments:
+		a = Start point (float)
+		b = End point (float)
+		n = Number of samples (int)
+	Output:
+		xi = 1D array containing n points in [a, b]
+	"""
+	ksi = zeros((1, n));
+	for i in range(1, n + 1):
+		ksi[0][i - 1] = cos((2*i - 1)*pi/(2*n));
+	xi = (a + b)/2 + (b - a)/2*ksi;
+	return xi[0];
 
 ## Quadrature
 def GenMatrix(N, x):
@@ -88,7 +105,7 @@ def f(x, z): return x + z + x**2 + z**2;
 #%% Input
 x0 = 0; x1 = 1;
 z0 = 0; z1 = 1;
-DOP = 10;
+DOP = 15;
 x_int_std = linspace(-1, 1, DOP);
 w_std = Quadrature_weights(x_int_std);
 x_int, w_x = Quadrature_weightTransform(x_int_std, w_std, x0, x1);
@@ -130,4 +147,26 @@ analytical = 1/120 + 1/48 + 1/72 + 1/360;
 print("Analytical Solution =", analytical);
 print("Numerical Solution =", I5D);
 error = (I5D - analytical)/analytical*100;
-print("Percentage error =", error, "%");
+print("Percentage error =", error, "% \n");
+
+#%% RBF integral test
+def RBF(x, y): return sqrt(1 + 400**2*(x**2 + y**2));
+DOP = 14;
+x_int = linspace(-1, 1, DOP);
+z_int = linspace(-1, 1, DOP);
+w_x = Quadrature_weights(x_int);
+w_z = Quadrature_weights(z_int);
+X, Z = meshgrid(x_int, z_int);
+fi = RBF(X, Z);
+fig = plt.figure();
+ax = plt.axes(projection = '3d');
+ax.plot_surface(X, Z, fi, rstride = 1, cstride = 1,
+				cmap = 'jet', edgecolor = 'none');
+w = stack((w_x, w_z));
+I = integrate(fi, w, "2D");
+analytical = 1224.32;
+print("Analytical Solution =", analytical);
+print("Numerical Solution =", I);
+error = (I - analytical)/analytical*100;
+print("Percentage error =", error, "% \n");
+plt.show();

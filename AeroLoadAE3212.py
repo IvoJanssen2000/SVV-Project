@@ -62,7 +62,6 @@ def Quadrature_weights(x):
 	Output:
 		w = Weights of the Quadrature rule
 	"""
-	#x = Cosine_Sampler(a, b, N);
 	N = len(x);
 	a = x[0]; b = x[-1];
 	A_i = GenMatrix(N, x);
@@ -72,16 +71,56 @@ def Quadrature_weights(x):
 	w = A_i.dot(B);
 	return w.T[0];
 
-def integrate(f, wx, wy):
-	""" Function to Compute 2D integral using Quadrature rule
+def integrate(f, w, dim):
+	""" Function to Compute 1D and 2D integral using Quadrature rule
 	Input Arguments:
 		f = Matrix containing function values at the nodes (numpy array)
-		wx = Quadrature weights in x (numpy array)
-		wy = Quadrature weights in y (numpy array)
+		w = Quadrature weights, if dim = 2D then w has to have 2 rows (numpy array)
+		dim = Dimention of definite integral, 1D or 2D (str)
 	Output:
 		I = Value of Integral
 	"""
-	I = f.dot(wx).dot(wy);
+	if dim == "1D":
+		I = f.dot(w);
+	elif dim == "2D":
+		I = f.dot(w[0, :]).dot(w[1, :]);
+	return I;
+
+def Quadrature_weightTransform(nodes, weights, a, b):
+	""" Function to transform Quadrature weights and nodes from one domain [c, d] to another [a, b]
+		while maintaining Degree of Percision
+	Input Arguments:
+		nodes = array with nodes in [c, d] (numpy array)
+		weights = array with weights calculated for nodes in [c, d] (numpy array)
+		[a, b] = new interval (float, float)
+	Output:
+		x_int = new Quadrature nodes (numpy array)
+		w = new Quadrature weights (numpy array)
+	"""
+	x_int = (b - a)/2*(nodes + 1) + a;
+	w = (b - a)/2*weights;
+	return x_int, w;
+
+def Triple_indefIntegral(x_vec, z_vec, DOP, f):
+	""" Function to compute triple integral with one indefinite integral and two 
+		definite integrals.
+	Input Arguments:
+		x_vec = array containing the bounds of one of the definite integrals (list or array)
+		z_vec = array containing the bounds of the other definite integral (list or array)
+	Output:
+		I = Value of Integral
+	"""
+	x_int, w_x = Quadrature_weightTransform(x_int_std, w_std, x_vec[0], x_vec[1]);
+	z_int, w_z = Quadrature_weightTransform(x_int_std, w_std, z_vec[0], z_vec[1]);
+	g = zeros_like(x_int);
+	for i in range(len(g)):
+		x_t, w_t = Quadrature_weightTransform(x_int_std, w_std, x_vec[0], x_int[i]);
+		#X, Z = meshgrid(x_t, z_int);
+		fi = f(x_t, z_int);
+		w = stack((w_t, w_z));
+		g[i] = integrate(fi, w, "2D");
+
+	I = integrate(g, w_x, "1D");
 	return I;
 
 ## Radial Basis Function Interpolation
@@ -144,8 +183,9 @@ def RBF(r):
 	Output:
 		basis = Value of basis function
 	"""
-	e = 1200;
-	basis = exp(-(e*r)**2);
+	e = 400;
+	#basis = exp(-(e*r)**2);
+	basis = sqrt(1 + (e*r)**2);
 	return basis;
 
 def RBF_Matrix(nodes):
@@ -223,27 +263,34 @@ if det(A) == 0.0:
 else:
 	b = data[::divx, ::divz].reshape(1, -1)[0];
 	coeff = inv(A).dot(b);
-	F = Inter(coeff, x, z, nodes);
+	x_p = Cosine_Sampler(x[0], x[-1], Nx);
+	z_p = linspace(z[0], z[-1], Nx);
+	X_p, Z_p = meshgrid(x_p, z_p);
+	F = Inter(coeff, x_p, z_p, nodes);
 	#%% Plots
 	fig = plt.figure();
 	ax = plt.axes(projection = '3d');
-	ax.plot_surface(X, Z, F, rstride = 1, cstride = 1,
+	ax.plot_surface(X_p, Z_p, F, rstride = 1, cstride = 1,
 					cmap = 'jet', edgecolor = 'none');
-	plt.plot(X1, Z1, 'x');
+	#plt.plot(X1, Z1, 'x');
 	ax.set_xlabel('Span [m]');
 	ax.set_ylabel('Chord [m]');
 	ax.set_zlabel('Loading [kN/m^2]');
 	plt.show();
 
 	#%% Quadrature Integral
-	Dop = 11;
-	x_int = linspace(0, span, Dop);
-	z_int = linspace(-chord, 0, Dop);
+	Dop = 16;
+	x_int_std = linspace(-1, 1, Dop);
+	w_std = Quadrature_weights(x_int_std);
+	x_int = Cosine_Sampler(0, span, Dop);
+	z_int = Cosine_Sampler(-chord, 0, Dop);
 	wx = Quadrature_weights(x_int);
 	wz = Quadrature_weights(z_int);
-	force_test = integrate(ones((Dop, Dop)), wx, wz);
-	force = integrate(Inter(coeff, x_int, z_int, nodes), wx, wz);
+	force_test = integrate(ones((Dop, Dop)), stack((wx, wz)), "2D");
+	force = integrate(Inter(coeff, x_int, z_int, nodes), stack((wx, wz)), "2D");
+	f = lambda x, y: Inter(coeff, x, y, nodes);
+	moment = Triple_indefIntegral([0, span], [-chord, 0], Dop, f);
 	print("Aerodynamic force =", force, "[kN]");
-	print("test case:");
-	print("Analytical Test =", chord*span);
-	print("Quadrature =", force_test);
+	print("Aerodynamic moment =", moment, "[kNm]");
+
+	
