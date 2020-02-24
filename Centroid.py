@@ -1,7 +1,29 @@
 import numpy as np
 import math as m
 
-from stiffener_spacing import diststiff
+#from stiffener_spacing import diststiff
+
+def diststiff(C_a, h_a, n_st):
+    """Function to compute the distance between each stiffener.
+    Input arguments:
+        C_a = Chord length [m]
+        h_a = Aileron height [m]
+        n_st = number of stiffeners [-]
+    Output arguments:
+        d_st = Distance between each stiffener [m]"""
+    
+    # Calculation of the perimeter of the aileron
+
+    Circ = np.pi*h_a/2                      # Calculation of the circumference of the semi-circle
+    lh_a = C_a-h_a/2                     # Calculation of the chord length of the aileron
+    ld_a = (lh_a**2 + (h_a/2)**2)**(1/2) # Calculation of the diagonal length of the aileron
+    Peri = Circ+2*ld_a                   # Circumference + 2x diagonal lengths
+
+    # Distance between each stiffener 
+
+    d_st = Peri/n_st
+
+    return d_st
 
 
 ######################## Part I - parameters as in assignment #######################################
@@ -25,8 +47,9 @@ theta = m.radians(25)  # rad
 P = 20.6*1000  # N
 
 
-z = diststiff()[2]
-y = diststiff()[3]
+z = diststiff(Ca,ha,nst)
+y = diststiff(Ca,ha,nst)
+
 
 
 
@@ -58,8 +81,11 @@ def get_total_y_centroid():     #### gives y-coordinate of centroid of whole str
 
 #offset_centroid_crosspoint_stringer = (hst/2)*hst*tst/areas()[0]
 
-print(z_centroids())
-print(y_centroids())
+z_centroids = z_centroids()
+y_centroids = y_centroids()
+
+print(z_centroids)
+print(y_centroids)
 
 #print(z_centroids())
 
