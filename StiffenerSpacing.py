@@ -235,3 +235,24 @@ plt.plot(zspar,yspar, color='black')
 
 plt.grid(True)
 plt.show()
+
+# Printing the Z & Y coordinates
+
+print("Z-coordinates: \n")
+for i in range(len(Zlst)):
+    print(Zlst[i])
+print("\n")
+
+print("Y-coordinates: \n")
+for j in range(len(Ylst)):
+    print(Ylst[j])
+print("\n")
+
+print("Z-coordinates with centroid contribution: \n")
+for i in range(len(Zcent)):
+    print(Zcent[i])
+print("\n")
+
+print("Y-coordinates with centroid contribution: \n")
+for j in range(len(Ycent)):
+    print(Ycent[j])
