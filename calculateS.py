@@ -76,10 +76,10 @@ def calculateSCoordinate(z,y):
 #(z,y)=(0.1,-2)                 returns -1                  ,-1 CORRECT
 #(z,y)=(0.124,0)                returns 0                   ,1  CORRECT
 #(z,y)=(0.062,0.10738715)       returns 0.12985249631374293 ,1  CORRECT
-#(z,y)=(0.08768124,-0.08768124) returns 0.5401681167838508  ,1  CORRECT
-#(z,y)=(-0.391,0)               returns 0.5341914187303289  ,2  CORRECT
-#(z,y)=(-0.1955,0.062)          returns 0.3290957093651644  ,2  CORRECT
-#(z,y)=(-0.1955,-0.062)         returns 0.7392871280954935  ,2  CORRECT
+#(z,y)=(0.08768124,-0.08768124) returns 1.1125509542445087  ,1  CORRECT
+#(z,y)=(-0.391,0)               returns 0.6049701632528961  ,2  CORRECT
+#(z,y)=(-0.1955,0.062)          returns 0.3998744538877316  ,2  CORRECT
+#(z,y)=(-0.1955,-0.062)         returns 0.8100658726180607  ,2  CORRECT
 
 
 

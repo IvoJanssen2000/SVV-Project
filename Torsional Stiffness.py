@@ -23,9 +23,11 @@ def getTorsionalStiffness():
                      [0]])
 
     result = np.linalg.inv(matA)*vec
-    print(result)
+    #print(result)
     J = T/(result[2])
+    print(result[2][0])
     print(J)
+    print(2*A1*result[0]+2*A2*result[1])
     return J
 
 
