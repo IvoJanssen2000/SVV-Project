@@ -20,11 +20,11 @@ tst = 0.0012    #m
 hst = 0.015     #m
 wst = 0.03      #m
 
+#Computing handy parameters
 R = h/2
 r = h/2 - tsk
 theta = m.atan(R/(Ca-R))
 l = np.sqrt((Ca-R)**2 + R**2)
-
 L = np.pi*R + 2* l
 d = L/11
 circ = 2*np.pi*R
@@ -32,59 +32,54 @@ alpha = m.radians(360 * d/circ)
 z = R*m.cos(alpha)
 y = R*m.sin(alpha)
 
+#def stringerlstgen():
+#    z6 = -Ca + R + d/2 * m.cos(theta)
+#    z5 = -Ca + R + d/2 * m.cos(theta) + 1*d*m.cos(theta)
+#    z4 = -Ca + R + d/2 * m.cos(theta) + 2*d*m.cos(theta)
+#    z3 = -Ca + R + d/2 * m.cos(theta) + 3*d*m.cos(theta)
+#    y6 = d/2 * m.sin(theta)
+#    y5 = d/2 * m.sin(theta) + 1*d*m.sin(theta)
+#    y4 = d/2 * m.sin(theta) + 2*d*m.sin(theta)
+#    y3 = d/2 * m.sin(theta) + 3*d*m.sin(theta)
+#    stringerlst = np.zeros((11,2)) #z,y
+#    stringerlst[0] = (R,0)
+#    stringerlst[1] = (z,y)
+#    stringerlst[2] = (z3,y3)
+#    stringerlst[3] = (z4,y4)
+#    stringerlst[4] = (z5,y5)
+#    stringerlst[5] = (z6,y6)
+#    stringerlst[6] = (z6,-y6)
+#    stringerlst[7] = (z5,-y5)
+#    stringerlst[8] = (z4,-y4)
+#    stringerlst[9] = (z3,-y3)
+#    stringerlst[10] = (z,-y)
+#    return stringerlst
 
-def stringerlstgen():
-    z6 = -Ca + R + d/2 * m.cos(theta)
-    z5 = -Ca + R + d/2 * m.cos(theta) + 1*d*m.cos(theta)
-    z4 = -Ca + R + d/2 * m.cos(theta) + 2*d*m.cos(theta)
-    z3 = -Ca + R + d/2 * m.cos(theta) + 3*d*m.cos(theta)
-    y6 = d/2 * m.sin(theta)
-    y5 = d/2 * m.sin(theta) + 1*d*m.sin(theta)
-    y4 = d/2 * m.sin(theta) + 2*d*m.sin(theta)
-    y3 = d/2 * m.sin(theta) + 3*d*m.sin(theta)
-    stringerlst = np.zeros((11,2)) #z,y
-    stringerlst[0] = (R,0)
-    stringerlst[1] = (z,y)
-    stringerlst[2] = (z3,y3)
-    stringerlst[3] = (z4,y4)
-    stringerlst[4] = (z5,y5)
-    stringerlst[5] = (z6,y6)
-    stringerlst[6] = (z6,-y6)
-    stringerlst[7] = (z5,-y5)
-    stringerlst[8] = (z4,-y4)
-    stringerlst[9] = (z3,-y3)
-    stringerlst[10] = (z,-y)
-    return stringerlst
+#def stringerylstgen():
+#    stringerylst = []
+#    stringerlst = stringerlstgen()
+#    for i in range(len(stringerlst)):
+#        stringerylst += [stringerlst[i][1]]
+#    return stringerylst
 
-def stringerylstgen():
-    stringerylst = []
-    stringerlst = stringerlstgen()
-    for i in range(len(stringerlst)):
-        stringerylst += [stringerlst[i][1]]
-    return stringerylst
-
-def stringerzlstgen():
-    stringerzlst = []
-    stringerlst = stringerlstgen()
-    for i in range(len(stringerlst)):
-        stringerzlst += [stringerlst[i][0]]
-    return stringerzlst
+#def stringerzlstgen():
+#    stringerzlst = []
+#    stringerlst = stringerlstgen()
+#    for i in range(len(stringerlst)):
+#        stringerzlst += [stringerlst[i][0]]
+#    return stringerzlst
 
 def Astringer(w,h,t):
     #Input width, heights and thickness. Output the area of the stringers
     return((w+h)*t)
 
-def Apanel(l,t):
-    #input the length and thickness of the panels, output is the area of the panel
-    return (l*t)
+def Arect(b,h):
+    #input the width and length of a rectangle, output the area of the rectangle
+    return (b*h )
 
 def Asemicircle(R,r):
-    #input the radius and thickness of the semi circle, output the area of the semi circle
+    #input the outer and inner radius of the semi circle, output the area of the semi circle
     return((np.pi/2)*(R**2-r**2))
-
-def Aspar(h,t):
-    #input the height and thickness of the spar. Output the area of the spar.
-    return (h*t)
 
 def Alstgen(Nstringer,Nspar,Nsemi,Npanel):
     #input the amount of each element, output a list of all the areas.
@@ -92,12 +87,14 @@ def Alstgen(Nstringer,Nspar,Nsemi,Npanel):
     for i in range(Nstringer):
         Alst += [Astringer(wst,hst,tst)]
     for i in range(Nspar):
-        Alst += [Aspar(h,tsp)]
+        Alst += [Arect(h,tsp)]
     for i in range(Nsemi):
         Alst += [Asemicircle(R,r)]        
     for i in range(Npanel):
-        Alst += [Apanel(l,tsk)]
+        Alst += [Arect(l,tsk)]
     return Alst
+
+print(Alstgen(1,2,2,1))
 
 ylstt = [
 0.0,
@@ -126,7 +123,6 @@ zlstt = [
 0.07675071331511048]
 
 def ycentroidlstgen():
-    stringerylst = stringerylstgen()
     ycentroidlst = ylstt
     ycentroidlst += [0.]
     ycentroidlst += [0.]
@@ -135,7 +131,6 @@ def ycentroidlstgen():
     return ycentroidlst
 
 def zcentroidlstgen():
-    stringerzlst = stringerzlstgen()
     zcentroidlst = zlstt
     zcentroidlst += [0.]
     zcentroidlst += [2*R/np.pi]
@@ -148,7 +143,8 @@ zcentroidlst += [0.]
 zcentroidlst += [2*R/np.pi]
 zcentroidlst += [-l*m.cos(theta)/2]
 zcentroidlst += [-l*m.cos(theta)/2]
-
+#zcentroidlst = zcentroidgen()
+print(zcentroidlst)
 #stringer, spar, semi, top, bottom
 def zcentroidgen():
     zcentroidlst = zcentroidlstgen()
@@ -167,10 +163,11 @@ def ycentroidgen():
         return(sum(lst)/sum(Alst))
 
 def MoIrotrec(b,h,theta):
+    #input the width, height and rotation angle of a rectangle, output the moment of inertia about its horizontal axis.
     return ((b * h)*(b**2 * m.cos(m.radians(90)-theta)**2 + h**2 * m.sin(m.radians(90)-theta)**2)/12)
 
 def MoIsemi(R,r):
-    #input the outer and inner radius of semi circle, output the moment of inertia about the center! NOT CENTROID!
+    #input the outer and inner radius of a semi circle, output the moment of inertia about the center.
     return((np.pi/8)*(R**4-r**4))
 
 def MoIzgen():
@@ -187,6 +184,14 @@ def MoIygen():
     MoIy += 2*MoIrotrec(tsk,l,m.radians(90)-theta) # Panels
     return MoIy  
 
+(tsp,h,R,r,l,tsk,theta) = (1,2,3,4,5,6,7)
+print('hier',MoIzgen())
+print(MoIrotrec(1,2,0)+MoIsemi(3,4)+2*MoIrotrec(5,6,7))
+(h,tsp,R,r,tsk,l,theta) = (1,2,3,4,5,6,7)
+print(MoIygen())
+print(MoIrotrec(1,2,0)+MoIsemi(3,4)+2*MoIrotrec(5,6,m.radians(90)-7))
+
+
 zcentroid = -0.0834027457341936
 ycentroid = 0
 
@@ -194,7 +199,7 @@ ycentroidlst = ycentroidlstgen()
 #zcentroidlst = zcentroidlstgen()
 
 #print(zcentroidlst,ycentroidlst)
-print('zbar = ',zcentroid,', ybar = ',ycentroid)
+#print('zbar = ',zcentroid,', ybar = ',ycentroid)
 Alst = Alstgen(Nstringer,Nspar,Nsemi,Npanel)
 #steinerterms
 
@@ -210,17 +215,21 @@ for i in range(len(zcentroidlst)):
 #print(Steinerzlst)
 #print(Steinerylst)
     
-print("Izz_st = ", sum(Steinerzlst))
-print("Iyy_st = ", sum(Steinerylst))
-print("Iyy = ", sum(Steinerylst)+MoIygen())
-Steinerylst += [Asemicircle(R,r)*2*abs(zcentroid)*2*R/np.pi]
-print(2*abs(zcentroid)*2*R/np.pi*Asemicircle(R,r))
+lst = []    
+for i in range(len([3,4])):
+     lst += [[2,1][i]*abs(1.5-[3,4][i])**2]
+print(lst)
+#print("Izz_st = ", sum(Steinerzlst))
+#print("Iyy_st = ", sum(Steinerylst))
+#print("Iyy = ", sum(Steinerylst)+MoIygen())
+#Steinerylst += [Asemicircle(R,r)*2*abs(zcentroid)*2*R/np.pi]
+#print(2*abs(zcentroid)*2*R/np.pi*Asemicircle(R,r))
 
-#Izz = 1.42e-05
-#Iyy = 5.377e-05
-Izz = sum(Steinerzlst)+MoIzgen()
-Iyy = sum(Steinerylst)+MoIygen()
+#Izzver = 1.42e-05
+#Iyyver = 5.377e-05
+#Izz = sum(Steinerzlst)+MoIzgen()
+#Iyy = sum(Steinerylst)+MoIygen()
 print("Izz = ", sum(Steinerzlst)+MoIzgen())
 print("Iyy = ", sum(Steinerylst)+MoIygen())
 
-print(Iyy/5.377e-05)
+#print(Iyy/5.377e-05)
