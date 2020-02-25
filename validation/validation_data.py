@@ -13,14 +13,19 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # inut file
 nodes    = np.genfromtxt('B737_input.INP', skip_header= 9 , skip_footer = 7996, delimiter = ','  )  
-elements = np.genfromtxt('B737_input.INP', skip_header= 6598 , skip_footer = 1361, delimiter = ',' , dtype = int )  
-     
+elements = np.genfromtxt('B737_input.INP', skip_header= 6598 , skip_footer = 1361, delimiter = ',' , dtype = int )
+
+
+
 # output file 
 stress1_1    = np.genfromtxt('B737.RPT', skip_header= 20 , skip_footer = 53992) #len of region 1 : 0 -> 53992. len = 5778 +
-
 stress1_2   = np.genfromtxt('B737.RPT', skip_header= 5778+20+18 , skip_footer = 53992-867)
 stress= np.vstack((stress1_1,stress1_2))
-stress_sorted = stress[stress[:,0].argsort()]  
+stress_sorted = stress[stress[:,0].argsort()]
+
+deflection    = np.genfromtxt('B737.RPT', skip_header= 20 , skip_footer = 53992)
+
+
 
 #x= np.zeros((len(nodes)))
 #y= np.zeros((len(nodes)))
@@ -47,12 +52,18 @@ for row in elements:
     i +=1
     
 
-segma_1 = stress_sorted[:,2]
-segma_2 = stress_sorted[:,3]
-#segma = 
+mises1 = stress_sorted[:, 2]
+mises2 = stress_sorted[:, 3]
+mises = (mises1 + mises2) / 2
+
+shear1 = stress_sorted[:, 4]
+shear2 = stress_sorted[:, 5]
+shear = (shear1 + shear2) / 2
+
+
 fig = plt.figure()
 ax = plt.axes(projection='3d')
-img = ax.scatter(x,y,z, c = segma )
+img = ax.scatter(x, y, z, c = shear)
 fig.colorbar(img)
 plt.show()
 
