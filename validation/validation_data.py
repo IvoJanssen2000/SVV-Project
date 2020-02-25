@@ -25,16 +25,17 @@ print(len(hingeline))
 
 # output file 
 stress1_1    = np.genfromtxt('B737.RPT', skip_header= 20 , skip_footer = 53992) #len of region 1 : 0 -> 53992. len = 5778 +
-print(stress1_1)
+#print(stress1_1)
 stress1_2   = np.genfromtxt('B737.RPT', skip_header= 5778+20+18 , skip_footer = 53992-867)
 stress= np.vstack((stress1_1,stress1_2))
 stress_sorted = stress[stress[:,0].argsort()]
 
-deflection    = np.genfromtxt('B737.RPT', skip_header= 20 , skip_footer = 53992)
-
-
-
-
+deflection_b = np.genfromtxt('B737.RPT', skip_header= 20074 , skip_footer = 33185)
+print(len(deflection_b))
+deflection_jb = np.genfromtxt('B737.RPT', skip_header= 26724 , skip_footer = 26554)
+print(len(deflection_jb))
+deflection_js = np.genfromtxt('B737.RPT', skip_header= 33374 , skip_footer = 19923)
+print(len(deflection_js))
 
 #x= np.zeros((len(nodes)))
 #y= np.zeros((len(nodes)))
