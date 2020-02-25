@@ -16,6 +16,12 @@ nodes    = np.genfromtxt('B737_input.INP', skip_header= 9 , skip_footer = 7996, 
 elements = np.genfromtxt('B737_input.INP', skip_header= 6598 , skip_footer = 1361, delimiter = ',' , dtype = int )
 
 
+hingeline = []
+for i in range(len(nodes)):
+    if nodes[i][2] == 0 and nodes[i][3] == 0:
+        hingeline.append(nodes[i])
+hingeline = np.array(hingeline)
+print(len(hingeline))
 
 # output file 
 stress1_1    = np.genfromtxt('B737.RPT', skip_header= 20 , skip_footer = 53992) #len of region 1 : 0 -> 53992. len = 5778 +
@@ -25,6 +31,8 @@ stress= np.vstack((stress1_1,stress1_2))
 stress_sorted = stress[stress[:,0].argsort()]
 
 deflection    = np.genfromtxt('B737.RPT', skip_header= 20 , skip_footer = 53992)
+
+
 
 
 
