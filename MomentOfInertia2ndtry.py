@@ -184,12 +184,6 @@ def MoIygen():
     MoIy += 2*MoIrotrec(tsk,l,m.radians(90)-theta) # Panels
     return MoIy  
 
-(tsp,h,R,r,l,tsk,theta) = (1,2,3,4,5,6,7)
-print('hier',MoIzgen())
-print(MoIrotrec(1,2,0)+MoIsemi(3,4)+2*MoIrotrec(5,6,7))
-(h,tsp,R,r,tsk,l,theta) = (1,2,3,4,5,6,7)
-print(MoIygen())
-print(MoIrotrec(1,2,0)+MoIsemi(3,4)+2*MoIrotrec(5,6,m.radians(90)-7))
 
 
 zcentroid = -0.0834027457341936
