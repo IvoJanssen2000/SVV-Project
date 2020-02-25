@@ -39,9 +39,6 @@ stress_js_2   = np.genfromtxt('B737.RPT', skip_header= 19186, skip_footer =39793
 stress_js= np.vstack((stress_js_1, stress_js_2))
 stress_js_sorted = stress_js[stress_js[:, 0].argsort()]
 
-#print(stress_jb_1)
-print(stress_js_sorted)
-
 
 
 
