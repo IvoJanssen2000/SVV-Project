@@ -19,6 +19,7 @@ elements = np.genfromtxt('B737_input.INP', skip_header= 6598 , skip_footer = 136
 
 # output file 
 stress1_1    = np.genfromtxt('B737.RPT', skip_header= 20 , skip_footer = 53992) #len of region 1 : 0 -> 53992. len = 5778 +
+print(stress1_1)
 stress1_2   = np.genfromtxt('B737.RPT', skip_header= 5778+20+18 , skip_footer = 53992-867)
 stress= np.vstack((stress1_1,stress1_2))
 stress_sorted = stress[stress[:,0].argsort()]
