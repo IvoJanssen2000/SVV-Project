@@ -24,6 +24,7 @@ hingeline = np.array(hingeline)
 print(len(hingeline))
 
 # output file 
+<<<<<<< HEAD
 stress1_1    = np.genfromtxt('B737.RPT', skip_header= 20 , skip_footer = 53992) #len of region 1 : 0 -> 53992. len = 5778 +
 #print(stress1_1)
 stress1_2   = np.genfromtxt('B737.RPT', skip_header= 5778+20+18 , skip_footer = 53992-867)
@@ -36,6 +37,33 @@ deflection_jb = np.genfromtxt('B737.RPT', skip_header= 26724 , skip_footer = 265
 print(len(deflection_jb))
 deflection_js = np.genfromtxt('B737.RPT', skip_header= 33374 , skip_footer = 19923)
 print(len(deflection_js))
+=======
+stress_b_1    = np.genfromtxt('B737.RPT', skip_header= 20, skip_footer = 53992) #len of region 1 : 0 -> 53992. len = 5778 +
+stress_b_2   = np.genfromtxt('B737.RPT', skip_header=5778 + 20 + 18, skip_footer =53992 - 867)
+stress_b= np.vstack((stress_b_1, stress_b_2))
+stress_b_sorted = stress_b[stress_b[:, 0].argsort()]
+
+stress_jb_1    = np.genfromtxt('B737.RPT', skip_header= 6705, skip_footer = 47326)
+stress_jb_2   = np.genfromtxt('B737.RPT', skip_header= 12501, skip_footer =46459)
+stress_jb= np.vstack((stress_jb_1, stress_jb_2))
+stress_jb_sorted = stress_jb[stress_jb[:, 0].argsort()]
+
+stress_js_1    = np.genfromtxt('B737.RPT', skip_header= 13390, skip_footer = 40660)
+stress_js_2   = np.genfromtxt('B737.RPT', skip_header= 19186, skip_footer =39793)
+stress_js= np.vstack((stress_js_1, stress_js_2))
+stress_js_sorted = stress_js[stress_js[:, 0].argsort()]
+
+
+
+
+
+
+deflection    = np.genfromtxt('B737.RPT', skip_header= 20075 , skip_footer = 53992)
+
+
+
+
+>>>>>>> ddcc433ff37a7c2fa67af4ea552ac0bb6ab121ef
 
 #x= np.zeros((len(nodes)))
 #y= np.zeros((len(nodes)))
@@ -62,12 +90,12 @@ for row in elements:
     i +=1
     
 
-mises1 = stress_sorted[:, 2]
-mises2 = stress_sorted[:, 3]
+mises1 = stress_b_sorted[:, 2]
+mises2 = stress_b_sorted[:, 3]
 mises = (mises1 + mises2) / 2
 
-shear1 = stress_sorted[:, 4]
-shear2 = stress_sorted[:, 5]
+shear1 = stress_b_sorted[:, 4]
+shear2 = stress_b_sorted[:, 5]
 shear = (shear1 + shear2) / 2
 
 
@@ -75,7 +103,7 @@ fig = plt.figure()
 ax = plt.axes(projection='3d')
 img = ax.scatter(x, y, z, c = shear)
 fig.colorbar(img)
-plt.show()
+#plt.show()
 
 
 #for i in range (len(nodes)):
