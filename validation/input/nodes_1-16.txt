@@ -1,12 +1,12 @@
-*Node
+*Node hinge 1      x              y             z
       1,         172.,           0.,           0.
-*Node
+*Node actuator I
       2,        1036.,        102.5,        102.5
-*Node
+*Node hinge 3
       3,        2591.,           0.,           0.
-*Node
+*Node actuator II
       4,        1386.,        102.5,        102.5
-*Node
+*Node start of aileron
       5,           0.,           0.,       -48.75
 *Node
       6,   266.100006,           0.,       -48.75
@@ -26,7 +26,7 @@
      13,   2128.80005,           0.,       -48.75
 *Node
      14,    2394.8999,           0.,       -48.75
-*Node
+*Node end of aileron
      15,        2661.,           0.,       -48.75
-*Node
+*Node hinge 2
      16,        1211.,           0.,           0.
