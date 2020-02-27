@@ -48,7 +48,7 @@ def Quadrature_weights(x):
 	w = A_i.dot(B);
 	return w.T[0];
 
-def integrate(f, w, dim):
+def QuadratureInt(f, w, dim):
 	""" Function to Compute 1D and 2D integral using Quadrature rule
 	Input Arguments:
 		f = Matrix containing function values at the nodes (numpy array)
@@ -97,9 +97,9 @@ def Triple_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std, torque):
 		if torque != 0:
 			fi *= (z_int - torque).reshape(len(z_int), 1);
 		w = stack((w_t, w_z));
-		g[i] = integrate(fi, w, "2D");
+		g[i] = QuadratureInt(fi, w, "2D");
 
-	I = integrate(g, w_x, "1D");
+	I = QuadratureInt(g, w_x, "1D");
 	return I;
 
 def FiveD_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
@@ -110,8 +110,8 @@ def FiveD_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 		g = zeros_like(ksi_int);
 		for j in range(len(ksi_int)):
 			g[j] = Triple_indefIntegral([x_int[0], ksi_int[j]], z_vec, DOP, f, x_int_std, w_std, 0);
-		G[i] = integrate(g, w_ksi, "1D");
-	I5D = integrate(G, w_x, "1D");
+		G[i] = QuadratureInt(g, w_ksi, "1D");
+	I5D = QuadratureInt(G, w_x, "1D");
 	return I5D;
 
 """ Verification """
@@ -131,7 +131,7 @@ def FiveD_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 #X, Z = meshgrid(x_int, z_int);
 #fi = f(X, Z);
 #w = stack((w_x, w_z));
-#I = integrate(fi, w, "2D");
+#I = QuadratureInt(fi, w, "2D");
 #analytical = 5/3;
 #print("Analytical Solution =", analytical);
 #print("Numerical Solution =", I);
@@ -155,9 +155,9 @@ def FiveD_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 #	g = zeros_like(ksi_int);
 #	for j in range(len(ksi_int)):
 #		g[j] = Triple_indefIntegral([x0, ksi_int[j]], [z0, z1], DOP, f, x_int_std, w_std, 0);
-#	G[i] = integrate(g, w_ksi, "1D");
+#	G[i] = QuadratureInt(g, w_ksi, "1D");
 
-#I5D = integrate(G, w_x, "1D");
+#I5D = QuadratureInt(G, w_x, "1D");
 #print(FiveD_indefIntegral([x0, x1], [z0, z1], DOP, f, x_int_std, w_std));
 #analytical = 1/120 + 1/48 + 1/72 + 1/360;
 #print("Analytical Solution =", analytical);
@@ -179,7 +179,7 @@ def FiveD_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 #ax.plot_surface(X, Z, fi, rstride = 1, cstride = 1,
 #				cmap = 'jet', edgecolor = 'none');
 #w = stack((w_x, w_z));
-#I = integrate(fi, w, "2D");
+#I = QuadratureInt(fi, w, "2D");
 #analytical = 1224.32;
 #print("Analytical Solution =", analytical);
 #print("Numerical Solution =", I);

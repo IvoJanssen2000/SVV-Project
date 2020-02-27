@@ -4,8 +4,6 @@ import numpy as np
 from mpl_toolkits import mplot3d
 
 
-
-
 ########## INPUT
 
 all_nodes = np.genfromtxt('input\\nodes_xyz.txt', delimiter =',', comments="*")
@@ -13,7 +11,6 @@ nodes_1_16 = np.genfromtxt('input\\nodes_1-16.txt', delimiter =',', comments="*"
 nodes_skin = np.genfromtxt('input\\nodes_skin.txt', delimiter =',', comments="*")
 
 all_elements = np.genfromtxt('input\\elements_4_nodes.txt', delimiter =',', comments="*")
-
 
 
 x= np.zeros(len(all_nodes))
@@ -31,7 +28,6 @@ z3 = []
 x_ele= np.zeros(len(all_elements))
 y_ele= np.zeros(len(all_elements))
 z_ele= np.zeros(len(all_elements))
-
 
 i = 0
 for row in all_nodes:
@@ -207,7 +203,6 @@ for x_coor in x_ele:
         z_c_sec_s12 = np.append(z_c_sec_s12, z_ele[i])
         s12_jb_c_sec = np.append(s12_jb_c_sec, stress_jb_2[i, 2])
     i=i+1
-        
 
 min_s12_c_sec = np.amin(s12_jb_c_sec)
 index_min_s12_c_sec = int(np.where(s12_jb_c_sec==min_s12_c_sec)[0])
@@ -265,7 +260,6 @@ ax1.set_xlabel('z [mm]')
 ax1.set_ylabel('y [mm]')
 
 
-
 fig2 = plt.figure()
 ax2 = plt.axes()
 ax2.invert_xaxis()
@@ -276,8 +270,6 @@ cbar2.set_label(r'[$\frac{N}{mm^2}$]')
 ax2.set_title("S12 Shear stress, Case: jammed bending")
 ax2.set_xlabel('z [mm]')
 ax2.set_ylabel('y [mm]')
-
-
 
 
 fig3 = plt.figure()
