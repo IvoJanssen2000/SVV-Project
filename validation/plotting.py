@@ -70,7 +70,13 @@ for row in all_elements:
 
 
 
+x_nodes_sorted = x[x.argsort()]
+y_nodes_sorted = y[y.argsort()]
+z_nodes_sorted = z[z.argsort()]
 
+x_ele_sorted = x_ele[x_ele.argsort()]
+y_ele_sorted = y_ele[y_ele.argsort()]
+z_ele_sorted = z_ele[z_ele.argsort()]
 
 
 
@@ -116,8 +122,8 @@ for row in stress_js:
 
 
 
-#Bending-case van mises stress and S12 (Shear stress)
-deflec_b = np.genfromtxt('output\\b_node_deflec.txt', skip_header= 3)
+#Jammed bending case deflection
+deflec_jb = np.genfromtxt('output\\jb_node_deflec.txt', skip_header= 3)
 
 
 
@@ -126,9 +132,16 @@ deflec_b = np.genfromtxt('output\\b_node_deflec.txt', skip_header= 3)
 max_stress = np.amax(stress_jb_2, axis=0)
 max_stress_ele = np.flip(np.array(np.where(stress_jb_2==np.amax(stress_jb_2, axis=0))))
 
+
+
+
+
+# HERE STRESS Mises
 # Mises Stress in cross-section
+# y values of cross_section are stored in y_c_sec_mises; z-values in z_c_sec_mises
 
 
+#cut_x_mises =  # insert x-Value here and Cut the cross-section at this x-value
 cut_x_mises = x_ele[max_stress_ele[1][1]]
 
 
@@ -149,8 +162,8 @@ mises_jb_c_sec = np.array([])
 
 
 i=0
-for x in x_ele:
-    if x==cut_x_mises:
+for x_coor2 in x_ele:
+    if x_coor2==cut_x_mises:
         y_c_sec_mises = np.append(y_c_sec_mises, y_ele[i])
         z_c_sec_mises = np.append(z_c_sec_mises, z_ele[i])
         mises_jb_c_sec = np.append(mises_jb_c_sec, stress_jb_2[i, 1])
@@ -188,8 +201,8 @@ s12_jb_c_sec = np.array([])
 
 
 i=0
-for x in x_ele:
-    if x==cut_x_s12:
+for x_coor in x_ele:
+    if x_coor==cut_x_s12:
         y_c_sec_s12 = np.append(y_c_sec_s12, y_ele[i])
         z_c_sec_s12 = np.append(z_c_sec_s12, z_ele[i])
         s12_jb_c_sec = np.append(s12_jb_c_sec, stress_jb_2[i, 2])
@@ -207,6 +220,35 @@ print("at z= ", z_c_sec_s12[index_min_s12_c_sec])
 
 
 
+# Deflection hinge-line
+
+x_hinge_line = np.array([])
+nodes_hinge_line = np.array([])
+y_deflec_hinge_line = np.array([])
+z_deflec_hinge_line = np.array([])
+
+xyz = np.transpose(np.vstack((x, y, z)))
+
+i=0
+for coord in xyz:
+    if coord[1]==0.:
+        if coord[2]==0.:
+            x_hinge_line = np.append(x_hinge_line, coord[0])
+            nodes_hinge_line = np.append(nodes_hinge_line, i+1)
+            y_deflec_hinge_line = np.append(y_deflec_hinge_line, deflec_jb[i][3])
+            z_deflec_hinge_line = np.append(z_deflec_hinge_line, deflec_jb[i][4])
+    i=i+1
+    
+
+        
+# Reaction forces
+
+rf_jb = np.genfromtxt('output\\jb_16_nodes_RF.txt', skip_header= 3)
+
+#rf_jb_table = list((5,5))
+#rf_jb_table[0,:] = np.array(['Location', 'RF Magnitude', 'RF x-direc.', 'RF y-direc.','RF z-direc.'])
+#rf_jb_table[1,:]
+
 
 
 ######## PLOTTING
@@ -214,24 +256,26 @@ print("at z= ", z_c_sec_s12[index_min_s12_c_sec])
 fig1 = plt.figure()
 ax1 = plt.axes()
 ax1.invert_xaxis()
-img = plt.scatter(z_c_sec_mises, y_c_sec_mises, c = mises_jb_c_sec, cmap ='RdYlGn_r')
+img1 = plt.scatter(z_c_sec_mises, y_c_sec_mises, c = mises_jb_c_sec, cmap ='RdYlGn_r')
 
-fig1.colorbar(img)
+cbar1 = fig1.colorbar(img1)
+cbar1.set_label(r'[$\frac{N}{mm^2}$]')
 ax1.set_title("Von Mises stresses, Case: jammed bending")
-ax1.set_xlabel('z')
-ax1.set_ylabel('y')
+ax1.set_xlabel('z [mm]')
+ax1.set_ylabel('y [mm]')
 
 
 
 fig2 = plt.figure()
 ax2 = plt.axes()
 ax2.invert_xaxis()
-img = plt.scatter(z_c_sec_mises, y_c_sec_mises, c = s12_jb_c_sec, cmap ='RdYlGn_r')
+img2 = plt.scatter(z_c_sec_mises, y_c_sec_mises, c = s12_jb_c_sec, cmap ='RdYlGn_r')
 
-fig2.colorbar(img)
+cbar2 = fig2.colorbar(img2)
+cbar2.set_label(r'[$\frac{N}{mm^2}$]')
 ax2.set_title("S12 Shear stress, Case: jammed bending")
-ax2.set_xlabel('z')
-ax2.set_ylabel('y')
+ax2.set_xlabel('z [mm]')
+ax2.set_ylabel('y [mm]')
 
 
 
@@ -239,24 +283,21 @@ ax2.set_ylabel('y')
 fig3 = plt.figure()
 ax3 = plt.axes()
 ax3.invert_xaxis()
-img = plt.scatter(z_c_sec_mises, y_c_sec_mises, c = s12_jb_c_sec, cmap ='RdYlGn_r')
+img = plt.scatter(x_hinge_line, y_deflec_hinge_line)
 
-fig3.colorbar(img)
-ax3.set_title("Deflection, Case: jammed bending")
-ax3.set_xlabel('z')
-ax3.set_ylabel('y')
+ax3.set_title("y-Deflection of hinge line, Case: jammed bending")
+ax3.set_xlabel('x [mm]')
+ax3.set_ylabel('y [mm]')
 
 
-#cmap = plt.get_cmap("jet")
-#img = plt.plot(z_mises_c_sec, y_mises_c_sec)
-#m = cm.ScalarMappable(cmap=plt.get_cmap("jet"))
-#img = plt.scatter(z_mises_c_sec, y_mises_c_sec, c = stress_c_sec)
-#fig.colorbar(img)
 
-#img = ax.scatter3D(x, y, z)
-#img2 = ax.scatter(x2, y2, z2)
-#img3 = ax.scatter(x3, y3, z3)
-#img4 = ax.scatter3D(x_ele, y_ele, z_ele)
+fig4 = plt.figure()
+ax4 = plt.axes()
+ax4.invert_xaxis()
+img = plt.scatter(x_hinge_line, z_deflec_hinge_line)
 
-#ax.set_zlabel('z')
+ax4.set_title("z-Deflection of hinge line, Case: jammed bending")
+ax4.set_xlabel('x [mm]')
+ax4.set_ylabel('z [mm]')
+
 plt.show()
