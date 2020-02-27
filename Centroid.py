@@ -28,12 +28,12 @@ def diststiff(C_a, h_a, n_st):
 
 ######################## Part I - parameters as in assignment #######################################
 aircraft = "Do228" # Write either A320, F100, CRJ700 or Do228 (bear in mind capitals); this is used for aerodynamic loading
-Ca = 0.515       # m
-la = 2.691       # m
-x1 = 0.174       # m
-x2 = 1.051       # m
-x3 = 2.512       # m
-xa = 0.30       # m
+Ca = 0.605       # m
+la = 2.661       # m
+x1 = 0.172       # m
+x2 = 1.211       # m
+x3 = 2.591       # m
+xa = 0.35       # m
 ha = 0.248       # m
 tsk = 1.1/1000  # m
 tsp = 2.2/1000  # m
