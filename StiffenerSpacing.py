@@ -13,11 +13,11 @@ def diststiff(C_a, h_a, n_st):
         n_st = number of stiffeners [-]
     Output arguments:
         d_st = Distance between each stiffener [m]"""
-    
+
     # Calculation of the perimeter of the aileron
 
     Circ = pi*h_a/2                      # Calculation of the circumference of the semi-circle
-    lh_a = C_a-h_a/2                     # Calculation of the chord length of the aileron
+    lh_a = C_a-h_a/2                     # Calculation of the horizontal length of the diagonal lines
     ld_a = (lh_a**2 + (h_a/2)**2)**(1/2) # Calculation of the diagonal length of the aileron
     Peri = Circ+2*ld_a                   # Circumference + 2x diagonal lengths
 
@@ -37,69 +37,99 @@ def stiffcoord(d_st, r, C_a):
         Zlst = Numpy array of the z-coordinates of the stiffeners [m]
         Ylst = Numpy array of the y-coordinates of the stiffeners [m]
         """
-    
+
     # Creating 11x1 array of zeroes for the Y-axis and Z-axis for the stiffeners
-    
-    Zlst = zeros((11))    
-    Ylst = zeros((11))
-    
+
+    Zlst = zeros((n_st))    
+    Ylst = zeros((n_st))
+
     # Assign the first stiffener at the leading edge on the chord line
 
     Zlst[0] = r 
     Ylst[0] = 0
-    
+
     # Finding the arc angle
-    
+
     theta = d_st/r
 
     # Assign the coordinates of the 2nd stiffener going clockwise from the first
-    
+
     Zlst[1] = r*cos(theta)
     Ylst[1] = r*sin(theta)
 
     # Assign the coordinates of the 3rd stiffener transitioning from the semi-circle to the top diagonal line
-    
+
     l = d_st-(pi/2-theta)*r
     delta = arctan(r/(C_a-r))
 
     Zlst[2] = -l*cos(delta)
     Ylst[2] = -l*sin(delta)+r
 
-    # Assign the coordinates of the 4-6th stiffener on the top diagonal line
-    
-    for i in range(3,6):
-        Zlst[i] = Zlst[i-1] - d_st*cos(delta)
-        Ylst[i] = Ylst[i-1] - d_st*sin(delta)
+    # For the case of 11 stiffeners
 
-    
-    # Assign the coordinates of the 7th stiffener transitioning from the top diagonal line to the bottom diagonal line
-    
-    mag_5 = ((Zlst[5]+(C_a-r))**2 + Ylst[5]**2)**(1/2)  # Calculating the hypotenuse of the top diagonal line between the chord line and the location of the 5th stiffener
-    diffd_st = d_st-mag_5                               # Calculating the hypotenuse of the bottom diagonal line between the chordline and the location of the 6th stiffener
-    Zlst[6] = diffd_st*cos(delta)-(C_a-r)               # Calculating Z coordinate of the 6th stiffener
-    Ylst[6] = -diffd_st*sin(delta)                      # Calculating the Y coordinate of the 6th stiffener
+    if n_st == 11:
 
-    # Assign the coordinates of the 8-10th stiffener on the bottom diagonal line
-    
-    for j in range(7,10):
-        Zlst[j] = Zlst[j-1] + d_st*cos(delta)
-        Ylst[j] = (Ylst[j-1] - d_st*sin(delta))
+         # Assign the coordinates of the 4-6th stiffener on the top diagonal line
+         
+        for i in range(3,6):
+            Zlst[i] = Zlst[i-1] - d_st*cos(delta)
+            Ylst[i] = Ylst[i-1] - d_st*sin(delta)
 
-    # Assign the coordinates of the 11th stiffener since it's symmetric along the semi-circle
+        # Assign the coordinates of the 7th stiffener transitioning from the top diagonal line to the bottom diagonal line
 
-    Zlst[10] = Zlst[1]
-    Ylst[10] = -Ylst[1]
+        mag_5 = ((Zlst[5]+(C_a-r))**2 + Ylst[5]**2)**(1/2)  # Calculating the hypotenuse of the top diagonal line between the chord line and the location of the 6th stiffener
+        diffd_st = d_st-mag_5                               # Calculating the hypotenuse of the bottom diagonal line between the chordline and the location of the 7th stiffener
+        Zlst[6] = diffd_st*cos(delta)-(C_a-r)               # Calculating Z coordinate of the 7th stiffener
+        Ylst[6] = -diffd_st*sin(delta)                      # Calculating the Y coordinate of the 7th stiffener
 
-##    for i in range(len(Zlst)):
-##        print("(",Zlst[i],",", Ylst[i],")", "\t i =", i)
-##
-##
-##    zline = [-r,0.391]
-##    yline = [0,0]
-##    plt.plot(-Zlst, -Ylst, 'o')
-##    plt.plot(zline, yline)
-##    plt.show()
+        # Assign the coordinates of the 7-10th stiffener on the bottom diagonal line
+
+        for j in range(7,10):
+            Zlst[j] = Zlst[j-1] + d_st*cos(delta)
+            Ylst[j] = (Ylst[j-1] - d_st*sin(delta))
+
+        # Assign the coordinates of the 11th stiffener since it's symmetric along the semi-circle
+
+        Zlst[10] = Zlst[1]
+        Ylst[10] = -Ylst[1]
         
+    # For the case of 15 stiffeners
+       
+    elif n_st == 15:
+
+        # Assign the coordinates of the 4-9th stiffener on the top diagonal line
+        
+        for i in range(3,8):
+            Zlst[i] = Zlst[i-1] - d_st*cos(delta)
+            Ylst[i] = Ylst[i-1] - d_st*sin(delta)        
+        
+        mag_7 = ((Zlst[7]+(C_a-r))**2 + Ylst[7]**2)**(1/2)  # Calculating the hypotenuse of the top diagonal line between the chord line and the location of the 8th stiffener
+        diffd_st = d_st-mag_7                               # Calculating the hypotenuse of the bottom diagonal line between the chordline and the location of the 8th stiffener
+        Zlst[8] = diffd_st*cos(delta)-(C_a-r)               # Calculating Z coordinate of the 9th stiffener
+        Ylst[8] = -diffd_st*sin(delta)                      # Calculating the Y coordinate of the 9th stiffener
+
+        # Assign the coordinates of the 10-14th stiffener on the bottom diagonal line
+
+        for j in range(9,14):
+            Zlst[j] = Zlst[j-1] + d_st*cos(delta)
+            Ylst[j] = (Ylst[j-1] - d_st*sin(delta))
+
+        # Assign the coordinates of the 15th stiffener since it's symmetric along the semi-circle
+
+        Zlst[14] = Zlst[1]
+        Ylst[14] = -Ylst[1]
+
+
+    ##    for i in range(len(Zlst)):
+    ##        print("(",Zlst[i],",", Ylst[i],")", "\t i =", i)
+    ##
+    ##
+    ##    zline = [-r,0.391]
+    ##    yline = [0,0]
+    ##    plt.plot(-Zlst, -Ylst, 'o')
+    ##    plt.plot(zline, yline)
+    ##    plt.show()
+        ##        
     return Zlst, Ylst
 
 def stiffcentcoord(Zlst, Ylst):
@@ -114,28 +144,49 @@ def stiffcentcoord(Zlst, Ylst):
 
     # Creating 11x1 array of zeroes for the Y-axis and Z-axis for the stiffeners centroid locations
     
-    Zcent = zeros((11))
-    Ycent = zeros((11))
+    Zcent = zeros((n_st))
+    Ycent = zeros((n_st))
 
     # Adjusting each Z and Y coordinate with their centroid locations
+
+    if n_st == 11:
     
-    Zcent[0] = Zlst[0]-2.5/1000
-    Ycent[0] = Ylst[0]
+        Zcent[0] = Zlst[0]+zdelta1/1000
+        Ycent[0] = Ylst[0]+ydelta1/1000
 
-    Zcent[1] = Zlst[1]-1.58/1000
-    Ycent[1] = Ylst[1]-1.94/1000
+        Zcent[1] = Zlst[1]+zdelta2/1000
+        Ycent[1] = Ylst[1]+ydelta2/1000
 
-    Zcent[10] = Zlst[10]-1.58/1000
-    Ycent[10] = Ylst[10]+1.94/1000
+        Zcent[10] = Zlst[10]+zdelta11/1000
+        Ycent[10] = Ylst[10]+ydelta11/1000
 
-    for i in range(2,6):
-        Zcent[i] = Zlst[i]+0.76/1000
-        Ycent[i] = Ylst[i]-2.38/1000
+        for i in range(2,6):
+            Zcent[i] = Zlst[i]+zdelta3_6/1000
+            Ycent[i] = Ylst[i]+ydelta3_6/1000
 
-    for i in range(6,10):
-        Zcent[i] = Zlst[i]+0.76/1000
-        Ycent[i] = Ylst[i]+2.38/1000
+        for i in range(6,10):
+            Zcent[i] = Zlst[i]+zdelta7_10/1000
+            Ycent[i] = Ylst[i]+ydelta7_10/1000
+            
+    if n_st == 15:
 
+        Zcent[0] = Zlst[0]+zdelta1/1000
+        Ycent[0] = Ylst[0]+ydelta1/1000
+
+        Zcent[1] = Zlst[1]+zdelta2/1000
+        Ycent[1] = Ylst[1]+ydelta2/1000
+
+        Zcent[14] = Zlst[14]+zdelta15/1000
+        Ycent[14] = Ylst[14]+ydelta15/1000
+        
+        for i in range(2,8):
+            Zcent[i] = Zlst[i]+zdelta3_8/1000
+            Ycent[i] = Ylst[i]+ydelta3_8/1000
+
+        for i in range(8,14):
+            Zcent[i] = Zlst[i]+zdelta9_14/1000
+            Ycent[i] = Ylst[i]+ydelta9_14/1000
+        
     return Zcent, Ycent
 
 def Arc(r, gamma):
@@ -169,11 +220,37 @@ def Triangle(height, length, z):
 
 N = 10          # Number of points
 t = 1.1e-3      # Thickness of the skin [m]       (Dornier Do 228: 1.1 mm)
-C_a = 0.515     # Chord length aileron [m]        (Dornier Do 228: 0.515 m)
-h_a = 24.8/100  # Aileron height [m]              (Dornier Do 228: 24.8 cm) 
-n_st = 11       # Number of stiffners             (Dornier Do 228: 11)
-r = h_a/2       # Radius of the semi-circle [m] 
+C_a = 0.605     # Chord length aileron [m]        (Dornier Do 228: 0.515 m)
+h_a = 20.5/100  # Aileron height [m]              (Dornier Do 228: 24.8 cm) 
+n_st = 15       # Number of stiffners             (Dornier Do 228: 11)
+r = h_a/2       # Radius of the semi-circle [m]
 
+
+if n_st == 11:
+    
+    zdelta1 = -2.5
+    zdelta2 = -1.58
+    zdelta3_6 = 0.76
+    zdelta7_10 = 0.76
+    zdelta11 = -1.58
+    ydelta1 = 0
+    ydelta2 = -1.94
+    ydelta3_6 = -2.38
+    ydelta7_10 = 2.38
+    y_delta11 = 1.94
+
+elif n_st == 15:
+    
+    zdelta1 = -3.657
+    zdelta2 = -2.34
+    zdelta3_8 = 1.106
+    zdelta9_14 = 1.106
+    zdelta15 = -2.34
+    ydelta1 = 0
+    ydelta2 = -2.8105
+    ydelta3_8 = -3.486
+    ydelta9_14 = 3.486
+    ydelta15 = 2.8105
 
 gamma = linspace(0, pi/2, N)            # Numpy array of all gamma values used for the leading edge arc
 z_coord = linspace(0, C_a - h_a/2, N)   # Numpy array of all Z coordinates for the triangle
@@ -192,10 +269,10 @@ Zcent, Ycent = stiffcentcoord(Zlst, Ylst)
 
 # Creating lines for plotting the chord line & the spar
 
-zline = [-0.124,0.391]
+zline = [-r,C_a-r]
 yline = [0,0]
 zspar = [0,0]
-yspar = [0.124,-0.124]
+yspar = [r,-r]
 
 # Adding the ZY coordinate system
 
