@@ -85,6 +85,6 @@ def InerpolationError(a, A):
 		e = error (numpy array)
 	"""
 	e = a/diagonal(inv(A));
-	print("Interpolation residuals =", e);
+	#print("Interpolation residuals =", e);
 	print("Interpolation error =", amax(e));
 	return e;
