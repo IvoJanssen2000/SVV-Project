@@ -137,24 +137,12 @@ max_stress_ele = np.flip(np.array(np.where(stress_jb_2==np.amax(stress_jb_2, axi
 # y values of cross_section are stored in y_c_sec_mises; z-values in z_c_sec_mises
 
 
-#cut_x_mises =  # insert x-Value here and Cut the cross-section at this x-value
+#cut_x_mises = x_ele_sorted[<insert index from WhatsApp group chat here>]
 cut_x_mises = x_ele[max_stress_ele[1][1]]
-
-
-print("Max. von Mises stress in element: ", max_stress_ele[1][1]+1)
-print("with von Mises stress of: ", max_stress[1])
-print("at x= ", x_ele[max_stress_ele[1][1]])
-print("at y= ", y_ele[max_stress_ele[1][1]])
-print("at z= ", z_ele[max_stress_ele[1][1]])
-print()
-
-
 
 y_c_sec_mises = np.array([])
 z_c_sec_mises = np.array([])
 mises_jb_c_sec = np.array([])
-
-
 
 
 i=0
@@ -167,6 +155,17 @@ for x_coor2 in x_ele:
 
 min_mises_c_sec = np.amin(mises_jb_c_sec)
 index_min_mises_c_sec = int(np.where(mises_jb_c_sec==min_mises_c_sec)[0])
+
+
+
+
+
+print("Max. von Mises stress in element: ", max_stress_ele[1][1]+1)
+print("with von Mises stress of: ", max_stress[1])
+print("at x= ", x_ele[max_stress_ele[1][1]])
+print("at y= ", y_ele[max_stress_ele[1][1]])
+print("at z= ", z_ele[max_stress_ele[1][1]])
+print()
 
 print("Min. von Mises stress in the same cross section of: ", min_mises_c_sec)
 print("at x= ", cut_x_mises)
@@ -181,15 +180,10 @@ print()
 
 # Shear in cross-section
 
+
+
+# cut_x_s12 = x_ele_sorted[<insert index from WhatsApp group chat here>]
 cut_x_s12 = x_ele[max_stress_ele[1][2]]
-
-print("Max. Shear stress in element: ", max_stress_ele[1][2]+1)
-print("with Shear stress of: ", max_stress[2])
-print("at x= ", x_ele[max_stress_ele[1][2]])
-print("at y= ", y_ele[max_stress_ele[1][2]])
-print("at z= ", z_ele[max_stress_ele[1][2]])
-print()
-
 
 y_c_sec_s12 = np.array([])
 z_c_sec_s12 = np.array([])
@@ -206,6 +200,16 @@ for x_coor in x_ele:
 
 min_s12_c_sec = np.amin(s12_jb_c_sec)
 index_min_s12_c_sec = int(np.where(s12_jb_c_sec==min_s12_c_sec)[0])
+
+
+
+
+print("Max. Shear stress in element: ", max_stress_ele[1][2]+1)
+print("with Shear stress of: ", max_stress[2])
+print("at x= ", x_ele[max_stress_ele[1][2]])
+print("at y= ", y_ele[max_stress_ele[1][2]])
+print("at z= ", z_ele[max_stress_ele[1][2]])
+print()
 
 print("Min. Shear stress in the same cross section of: ", min_s12_c_sec)
 print("at x= ", cut_x_s12)
@@ -279,7 +283,7 @@ img = plt.scatter(x_hinge_line, y_deflec_hinge_line)
 
 ax3.set_title("y-Deflection of hinge line, Case: jammed bending")
 ax3.set_xlabel('x [mm]')
-ax3.set_ylabel('y [mm]')
+ax3.set_ylabel('deflection in y [mm]')
 
 
 
@@ -290,6 +294,6 @@ img = plt.scatter(x_hinge_line, z_deflec_hinge_line)
 
 ax4.set_title("z-Deflection of hinge line, Case: jammed bending")
 ax4.set_xlabel('x [mm]')
-ax4.set_ylabel('z [mm]')
+ax4.set_ylabel('deflection in z [mm]')
 
 plt.show()
