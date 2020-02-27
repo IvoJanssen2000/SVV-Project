@@ -130,15 +130,15 @@ def deflection_w(x, R1z, Ra1, theta_a, R2z, R3z, P, integral_val, C1, C2, E, Iyy
 				R3z*step(x - x3, i) - P*cos(theta_a)*step(x - xa2, i) - integral_val + 6*C1*x + 6*C2);
 	return w;
 
-def twist(x, R1y, Ra1, theta_a, R2y, R3y, P, integral_val, C, G, J, r, z_sc, bool):
+def twist(x, R1y, Ra1, theta_a, R2y, R3y, P, integral_val, C1, G, J, r, z_sc, bool):
 	if bool == "Theta":
 		i = 1;
 		c = G*J;
 	elif bool == "Torque":
 		i = 0;
 		c = 1;
-		C = 0;
+		C1 = 0;
 	theta = 1/c*(R1y*z_sc*step(x - x1, i) + R2y*z_sc*step(x - x2, i) + R3y*z_sc*step(x - x3, i) - 
 			  Ra1*sin(theta_a)*(r - z_sc)*step(x - xa1, i) + Ra1*cos(theta_a)*r*step(x - xa1, i) + 
-			  P*sin(theta_a)*(r - z_sc)*step(x - xa2, i) - P*cos(theta_a)*r*step(x - xa2, i) + integral_val + C);
+			  P*sin(theta_a)*(r - z_sc)*step(x - xa2, i) - P*cos(theta_a)*r*step(x - xa2, i) + integral_val + C1);
 	return theta;
