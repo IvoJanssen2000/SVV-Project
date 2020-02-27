@@ -78,7 +78,7 @@ def Quadrature_weightTransform(nodes, weights, a, b):
 	w = (b - a)/2*weights;
 	return x_int, w;
 
-def Triple_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
+def Triple_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std, torque):
 	""" Function to compute triple integral with one indefinite integral and two 
 		definite integrals.
 	Input Arguments:
@@ -94,11 +94,25 @@ def Triple_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 		x_t, w_t = Quadrature_weightTransform(x_int_std, w_std, x_vec[0], x_int[i]);
 		X, Z = meshgrid(x_t, z_int);
 		fi = f(X, Z);
+		if torque != 0:
+			fi *= (z_int - torque).reshape(len(z_int), 1);
 		w = stack((w_t, w_z));
 		g[i] = integrate(fi, w, "2D");
 
 	I = integrate(g, w_x, "1D");
 	return I;
+
+def FiveD_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
+	x_int, w_x = Quadrature_weightTransform(x_int_std, w_std, x_vec[0], x_vec[1]);
+	G = zeros_like(x_int);
+	for i in range(len(x_int)):
+		ksi_int, w_ksi = Quadrature_weightTransform(x_int_std, w_std, x_int[0], x_int[i]);
+		g = zeros_like(ksi_int);
+		for j in range(len(ksi_int)):
+			g[j] = Triple_indefIntegral([x_int[0], ksi_int[j]], z_vec, DOP, f, x_int_std, w_std, 0);
+		G[i] = integrate(g, w_ksi, "1D");
+	I5D = integrate(G, w_x, "1D");
+	return I5D;
 
 """ Verification """
 #def f(x, z): return x + z + x**2 + z**2;
@@ -126,7 +140,7 @@ def Triple_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 
 ##%% 3D Integral with indefinite integral Verification
 #print("## Verification of 3D Integral with indefinite integral ## \n");
-#I = Triple_indefIntegral([x0, x1], [z0, z1], 4, f, x_int_std, w_std);
+#I = Triple_indefIntegral([x0, x1], [z0, z1], 4, f, x_int_std, w_std, 0);
 #analytical = 1/6 + 1/6 + 1/4 + 1/12;
 #print("Analytical Solution =", analytical);
 #print("Numerical Solution =", I);
@@ -140,10 +154,11 @@ def Triple_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 #	ksi_int, w_ksi = Quadrature_weightTransform(x_int_std, w_std, x0, x_int[i]);
 #	g = zeros_like(ksi_int);
 #	for j in range(len(ksi_int)):
-#		g[j] = Triple_indefIntegral([x0, ksi_int[j]], [z0, z1], DOP, f, x_int_std, w_std);
+#		g[j] = Triple_indefIntegral([x0, ksi_int[j]], [z0, z1], DOP, f, x_int_std, w_std, 0);
 #	G[i] = integrate(g, w_ksi, "1D");
 
 #I5D = integrate(G, w_x, "1D");
+#print(FiveD_indefIntegral([x0, x1], [z0, z1], DOP, f, x_int_std, w_std));
 #analytical = 1/120 + 1/48 + 1/72 + 1/360;
 #print("Analytical Solution =", analytical);
 #print("Numerical Solution =", I5D);
@@ -152,7 +167,7 @@ def Triple_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 
 ##%% RBF integral test
 #def RBF(x, y): return sqrt(1 + 400**2*(x**2 + y**2));
-#DOP = 14;
+#DOP = 15;
 #x_int = linspace(-1, 1, DOP);
 #z_int = linspace(-1, 1, DOP);
 #w_x = Quadrature_weights(x_int);
@@ -170,4 +185,7 @@ def Triple_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 #print("Numerical Solution =", I);
 #error = (I - analytical)/analytical*100;
 #print("Percentage error =", error, "% \n");
-#plt.show();
+##plt.show();
+
+#I = Triple_indefIntegral([0, 1], [0, 10], DOP, RBF, x_int_std, w_std, 0);
+#print(I);
