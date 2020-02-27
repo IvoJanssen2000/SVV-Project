@@ -31,7 +31,6 @@ alpha = m.radians(360 * d/circ)
 z = R*m.cos(alpha)
 y = R*m.sin(alpha)
 
-print('hier',circ/4)
 
 def Astringer(w,h,t):
     #Input width, heights and thickness. Output the area of the stringers
@@ -79,6 +78,18 @@ def MoIygen(): #creates Iyy
     MoIy += MoIsemi(R,r) #Leading edge
     MoIy += 2*MoIrotrec(tsk,l,m.radians(90)-theta) # Panels
     return MoIy  
+
+Alst = Alstgen(Nstringer,Nspar,Nsemi,Npanel)
+
+zcentroidlst = [ 0.1025    ,  0.06557951, -0.01831074, -0.10634515, -0.19437956,
+       -0.28241397, -0.37044838, -0.45848279, -0.45848279, -0.37044838,
+       -0.28241397, -0.19437956, -0.10634515, -0.01831074,  0.06557951]
+ycentroidlst = [ 0.        ,  0.07877549,  0.09876497,  0.08080771,  0.06285044,
+        0.04489317,  0.0269359 ,  0.00897863, -0.00897863, -0.0269359 ,
+       -0.04489317, -0.06285044, -0.08080771, -0.09876497, -0.07877549]
+
+ycentroid = 0
+zcentroid = -0.1379876679847025
 
 Steinerzlst = [] #creates a list with the steiner terms for Izz
 for i in range(len(ycentroidlst)):
