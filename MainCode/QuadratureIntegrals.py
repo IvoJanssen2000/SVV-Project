@@ -185,7 +185,7 @@ def FiveD_indefIntegral(x_vec, z_vec, DOP, f, x_int_std, w_std):
 #print("Numerical Solution =", I);
 #error = (I - analytical)/analytical*100;
 #print("Percentage error =", error, "% \n");
-##plt.show();
+#plt.show();
 
 #I = Triple_indefIntegral([0, 1], [0, 10], DOP, RBF, x_int_std, w_std, 0);
 #print(I);
